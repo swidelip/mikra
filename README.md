@@ -13,9 +13,9 @@ What mikra do
 
 ![mikra](https://user-images.githubusercontent.com/78678868/109455180-dfd66a00-7a77-11eb-99fd-2ee8d3d19bbf.png "mikra")
 
-Supported software
+Supported browsers
 ----
 
-| &#13; | Windows |
-|-------|---------|
-| Browsers | Brave<br> Chrome Canary<br> Chromium<br> Firefox<br> Google Chrome<br> Opera<br> Opera GX<br> Vivaldi<br> Yandex |
+| Windows |
+|---------|
+| Brave<br> Chrome Canary<br> Chromium<br> Firefox<br> Google Chrome<br> Opera<br> Opera GX<br> Vivaldi<br> Yandex |
