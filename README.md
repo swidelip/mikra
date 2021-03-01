@@ -4,8 +4,7 @@ Simple stealer on python
 
 What mikra do 
 ----
-* Creating dir ( where is located mikra )
-* Creating log file
+* Creating dir ( where is located mikra ) and log file
 * Сollects information about the computer and write into log file
 * Searching .txt and .docx files in directory's: Desktop and Documents, then copy it
 * Searching Wi-Fi passwords and write into log file
