@@ -304,6 +304,7 @@ try:
 		browsers()
 		print(")")
 		logfile.write("\n)")
+		os._exit(0)
 		#ctypes.windll.kernel32.SetFileAttributesW(dio, 0x02)
 		#os.system("cls")
 except KeyboardInterrupt:
