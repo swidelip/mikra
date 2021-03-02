@@ -17,4 +17,4 @@ Supported browsers
 
 | Windows |
 |---------|
-| Brave<br> Chrome Canary<br> Chromium<br> Firefox<br> Google Chrome<br> Opera<br> Opera GX<br> Vivaldi<br> Yandex |
+| Brave<br> Chrome Canary<br> Chromium<br> CocCoc<br> Firefox<br> Google Chrome<br> Opera<br> Opera GX<br> Vivaldi<br> Yandex |
