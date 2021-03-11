@@ -12,6 +12,25 @@ What mikra do
 
 ![mikra](https://user-images.githubusercontent.com/78678868/109455180-dfd66a00-7a77-11eb-99fd-2ee8d3d19bbf.png "mikra")
 
+Usage
+----
+* Launch
+```
+mikra.exe
+```
+* Get help
+```
+mikra.exe -h
+```
+* Quit mode (nothing will be print)
+```
+mikra.exe -q
+```
+* Set hidden attribute to mikra dir
+```
+mikra.exe -xh
+```
+
 Supported browsers
 ----
 
