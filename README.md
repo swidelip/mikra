@@ -1,3 +1,4 @@
+
 __mikra__
 ===
 Simple stealer on python
@@ -10,7 +11,7 @@ What can mikra
 * Search Wi-Fi passwords and write into log file
 * Search Browsers data and copy it
 
-![mikra](https://user-images.githubusercontent.com/78678868/109455180-dfd66a00-7a77-11eb-99fd-2ee8d3d19bbf.png "mikra")
+![mikra](https://user-images.githubusercontent.com/78678868/111022712-46537480-83f6-11eb-9070-8bea09e0da95.png "mikra.exe all")
 
 Usage
 ----
@@ -41,4 +42,4 @@ Supported browsers
 
 | Windows |
 |---------|
-| Atom<br> Brave<br> Chrome Canary<br> Chromium<br> CocCoc<br> Firefox<br> Google Chrome<br> Orbitum<br> Opera<br> Opera GX<br> Vivaldi<br> Yandex |
+| Atom<br> Brave<br> Chrome Canary<br> Chromium<br> CocCoc<br> Firefox<br> Google Chrome<br> Orbitum<br> Opera<br> Opera GX<br> Vivaldi<br> Yandex
