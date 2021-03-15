@@ -5,11 +5,11 @@ Simple stealer on python
 
 What can mikra
 ----
-* Create dir ( where is located mikra ) and log file
-* Сollect information about the computer and write into log file
-* Search .txt and .docx files in directory's: Desktop and Documents, then copy it
-* Search Wi-Fi passwords and write into log file
-* Search Browsers data and copy it
+* Сreate own folder and log file
+* Сollect information about the computer
+* Search .txt and .docx files in directory's: Desktop and Documents
+* Search Wi-Fi passwords
+* Search Browsers data
 
 <p align="center">
   <img src="https://user-images.githubusercontent.com/78678868/111022712-46537480-83f6-11eb-9070-8bea09e0da95.png">
