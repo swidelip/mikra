@@ -7,9 +7,9 @@ What can mikra
 ----
 * Сreate own folder and log file
 * Сollect information about the computer
-* Search .txt and .docx files in directory's: Desktop and Documents
-* Search Wi-Fi passwords
-* Search Browsers data
+* Copy .txt and .docx files from directory's: Desktop and Documents
+* Collect Wi-Fi passwords
+* Copy browsers data
 
 <p align="center">
   <img src="https://user-images.githubusercontent.com/78678868/111022712-46537480-83f6-11eb-9070-8bea09e0da95.png">
