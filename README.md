@@ -23,7 +23,7 @@ mikra.exe all
 * Launch specific modules
 ```
 mikra.exe browsers
-mikra.exe wifi browsers
+mikra.exe network browsers
 ```
 * Get help
 ```
