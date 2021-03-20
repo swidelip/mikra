@@ -11,7 +11,7 @@ What can mikra
 * Copy browsers data
 
 <p align="center">
-  <img src="https://user-images.githubusercontent.com/78678868/111269374-5b2b4480-8650-11eb-8c3b-0f3af540c177.png">
+  <img src="https://user-images.githubusercontent.com/78678868/111866161-466ee980-898d-11eb-93dc-a43ec3921984.png">
 </p>
 
 Usage
