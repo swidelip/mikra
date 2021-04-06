@@ -8,6 +8,7 @@ What can mikra
 * Сollect information about the computer
 * Copy .txt and .docx files from directory's: Desktop and Documents
 * Collect Wi-Fi passwords
+* Collect antiviruses list
 * Copy browsers data
 
 <p align="center">
@@ -36,6 +37,10 @@ mikra.exe all -q
 * Set hidden attribute to mikra dir
 ```
 mikra.exe all -xh
+```
+* Hide main window
+```
+mikra.exe all -t
 ```
 
 Supported browsers
