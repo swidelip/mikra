@@ -47,4 +47,4 @@ Supported browsers
 ----
 | Windows |
 |---------|
-| Atom<br> Brave<br> Chrome Canary<br> Chromium<br> CocCoc<br> Firefox<br> Google Chrome<br> Orbitum<br> Opera<br> Opera GX<br> Vivaldi<br> Yandex
+| Atom<br> Brave<br> Chrome Canary<br> Chromium<br> CocCoc<br> Firefox<br> Google Chrome<br> Microsoft Edge<br> Orbitum<br> Opera<br> Opera GX<br> Vivaldi<br> Yandex
