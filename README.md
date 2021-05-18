@@ -1,6 +1,6 @@
 __mikra__
 ===
- usb/local stealer, that can steal almost all information from the computer
+usb/local stealer, that can steal a lot of information from the computer
 
 What can mikra
 ----
