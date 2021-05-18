@@ -1,6 +1,10 @@
 __mikra__
 ===
-usb/local stealer, that can steal a lot of information from the computer
+usb/local stealer on python🐍
+
+Disclaimer
+----
+This script has written exclusively for educational purposes, the author is not responsible for what you have done
 
 What can mikra
 ----
